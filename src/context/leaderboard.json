@@ -1,0 +1,55 @@
+[
+  {
+    "id": "1",
+    "name": "Colossal",
+    "symbol": "COL",
+    "image": "https://defai.s3.ap-southeast-1.amazonaws.com/collossal.png",
+    "rank": 1,
+    "market_cap": null,
+    "portfolio": null,
+    "change_24h": null,
+    "users": null,
+    "aumAmount": null,
+    "aumValue": null
+  },
+  {
+    "id": "2",
+    "name": "Attack",
+    "symbol": "ATK",
+    "image": "https://defai.s3.ap-southeast-1.amazonaws.com/attack.png",
+    "rank": 2,
+    "market_cap": null,
+    "portfolio": null,
+    "change_24h": null,
+    "users": null,
+    "aumAmount": null,
+    "aumValue": null
+  },
+  
+  {
+    "id": "3",
+    "name": "JAW",
+    "symbol": "JAW",
+    "image": "https://defai.s3.ap-southeast-1.amazonaws.com/jaw.png",
+    "rank": 3,
+    "market_cap": null,
+    "portfolio": null,
+    "change_24h": null,
+    "users": null,
+    "aumAmount": null,
+    "aumValue": null
+  },
+  {
+    "id": "4",
+    "name": "AMORED",
+    "symbol": "AMO",
+    "image": "https://defai.s3.ap-southeast-1.amazonaws.com/amored.png",
+    "rank": 4,
+    "market_cap": null,
+    "portfolio": null,
+    "change_24h": null,
+    "users": null,
+    "aumAmount": null,
+    "aumValue": null
+  }
+]

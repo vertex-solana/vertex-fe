@@ -1,0 +1,147 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-roc: "Roc Grotesk Wide Medium";
+  --border-size: 2px;
+  --dash-size: 1em;
+}
+
+html {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+
+  color: #ffffff;
+  background-color: #0e0e12;
+  pointer-events: auto !important;
+}
+
+strong {
+  word-wrap: break-word;
+}
+
+@font-face {
+  font-family: "White Rabbit";
+  src: url("../../public/fonts/WhiteRabbit.woff") format("woff"),
+    url("../../public/fonts/WhiteRabbit.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Jersey20-Regular";
+  src: url("../../public/fonts/Jersey20-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.center-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-vertical-root {
+  display: flex;
+  align-items: center;
+}
+
+.space-between-root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.eclipse {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* default 1 line */
+  -webkit-box-orient: vertical;
+}
+
+::-webkit-scrollbar {
+  width: 2px;
+  display: flex;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  display: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+:root {
+  --border-size: 2px;
+  --box-width: 36em;
+  --box-height: 8em;
+  --dash-size: 1em;
+}
+
+.custom-dashed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='10' ry='10' stroke='%23333' stroke-width='4' stroke-dasharray='16' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+}
+
+.webkit-box {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    #e06ae6,
+    #7595ff
+  ); /* Adjust the colors and direction as needed */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
