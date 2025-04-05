@@ -51,11 +51,57 @@ export const StoreModal = () => {
 	});
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
+		setIsLoading(true);
 
-    console.log('Form values:', values);
+		try {
+			const formData = new FormData();
+			formData.append('name', values.idlName);
+			formData.append('programId', values.programId);
+			formData.append('version', values.version);
 
-  };
+			const idlBlob = new Blob([values.idl], { type: 'application/json' });
+			formData.append('idlJson', idlBlob);
+
+			const idlResponse = await axios.post(
+				'http://localhost:3001/edas-account/api/idl-dapp/upload',
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
+
+      if (idlResponse.status !== 201) {
+				toast.error('Failed to upload IDL. Please try again.');
+				return;
+			}
+			const idlId = idlResponse.data.data.id;
+
+			const createIndexerPayload = {
+				name: values.indexerName,
+				idlId: idlId,
+			};
+
+			await axios.post(
+				'http://localhost:3001/edas-account/api/indexer/create',
+				createIndexerPayload,
+				{
+					headers: {
+						Authorization: `Bearer YOUR_AUTH_TOKEN`, // TODO: Replace with actual token
+					},
+				}
+			);
+
+			toast.success('Indexer created successfully!');
+			storeModal.onClose();
+		} catch (error) {
+			console.error('Error:', error);
+			toast.error('Failed to create indexer. Please try again.');
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
   return (
 		<Modal

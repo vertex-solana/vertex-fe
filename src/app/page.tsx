@@ -1,29 +1,26 @@
 'use client';
 
-import { useStoreModal } from '@/hooks/use-store-modal';
+import { Switch, Route } from 'wouter';
+import { Toaster } from '@/components/ui/toaster';
+import NotFound from '@/components/layout/not-found';
+import Home from '@/components/layout/home';
 
-const Home = () => {
-  const onOpen = useStoreModal((state) => state.onOpen);
-  const isOpen = useStoreModal((state) => state.isOpen);
+function Router() {
+	return (
+		<Switch>
+			<Route path="/" component={Home} />
+			<Route component={NotFound} />
+		</Switch>
+	);
+}
 
-  // useEffect(() => {
-  //   if (!isOpen) {
-  //     onOpen();
-  //   }
-  // }, [isOpen, onOpen]);
-
-  return <div id="home">
-    <h1 className="font-bold underline mb-10">Hello world!</h1>
-    <button
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      type="button"
-      onClick={() => {
-        onOpen();
-      }}
-    >
-      Create Indexer
-    </button>
-  </div>;
+const App = () => {
+	return (
+		<div id="home">
+			<Router />
+			<Toaster />
+		</div>
+	);
 };
 
-export default Home;
+export default App;
