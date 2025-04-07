@@ -75,9 +75,9 @@ export enum WhitelistType {
 }
 
 export interface ElanderEligibleInterface {
- whitelist: WhitelistType[];
- totalStaked: number;
- rankingEnsoPoint: number | null;
+  whitelist: WhitelistType[];
+  totalStaked: number;
+  rankingEnsoPoint: number | null;
 }
 
 export enum ExploreStatusEnum {
@@ -152,4 +152,24 @@ export enum EclipseSupportedTokenEnum {
   USDC = "USDC",
   ETH = "ETH",
   SOL = "SOL",
+}
+
+// Start for Vertex
+interface SchemaField {
+  name: string;
+  type: string;
+  nullable: boolean;
+}
+
+export interface IndexerTableMetadata {
+  tableName: string;
+  fullTableName: string;
+  schema: SchemaField[];
+  indexerId: number;
+}
+
+export interface ExecuteQueryResponse {
+  query: string;
+  schema: { [key: string]: any };
+  rows: { [key: string]: any }[];
 }
