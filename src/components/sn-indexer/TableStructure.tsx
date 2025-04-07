@@ -17,27 +17,33 @@ interface TableStructureProps {
 
 const TableStructure: FC<TableStructureProps> = ({ tableMetadata }) => {
   return (
-    <Table className="mb-4 border-collapse border border-gray-300">
-      <TableHeader>
-        <TableRow className="border-b border-gray-400">
-          <TableHead>Column Name</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Nullable</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {tableMetadata.schema.map((field, index) => (
-          <TableRow
-            key={index}
-            className="border-b border-gray-300 last:border-b-0"
-          >
-            <TableCell>{field.name}</TableCell>
-            <TableCell>{field.type}</TableCell>
-            <TableCell>{field.nullable ? "Yes" : "No"}</TableCell>
+    <div
+      className="mb-8 p-4 border rounded shadow bg-slate-900"
+    >
+      <h3 className="text-xl font-bold mb-2">{tableMetadata.tableName}</h3>
+      <p className="text-sm text-gray-400 mb-4">
+        Full Table Name: {tableMetadata.fullTableName}
+      </p>
+      <Table className="mb-4">
+        <TableHeader>
+          <TableRow className="border-b border-gray-600">
+            <TableHead>Column</TableHead>
+            <TableHead>Type</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {tableMetadata.schema.map((field, index) => (
+            <TableRow
+              key={index}
+              className="border-b border-gray-700 last:border-b-0"
+            >
+              <TableCell>{field.name}</TableCell>
+              <TableCell>{field.type}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
