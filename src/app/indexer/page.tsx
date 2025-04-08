@@ -10,7 +10,7 @@ const Indexer = () => {
   const isOpen = useStoreModal((state) => state.isOpen);
   const [indexers, setIndexers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedIndexerId, setSelectedIndexerId] = useState<string | null>(
+  const [selectedIndexerId, setSelectedIndexerId] = useState<number | null>(
     null
   );
 

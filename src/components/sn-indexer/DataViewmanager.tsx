@@ -26,8 +26,8 @@ const DataViewManager = ({ responseQuery }: DataViewManagerProps) => {
         value={activeView}
         onValueChange={setActiveView}
       >
-        <div className="flex items-center justify-between mb-4">
-          <TabsList className="bg-slate-800">
+        <div className="sticky top-0 flex items-center justify-between mb-4">
+          <TabsList className="bg-slate-800 z-10 shadow-md">
             <TabsTrigger value="table" className="flex items-center gap-2">
               <Table size={16} />
               <span>Table</span>

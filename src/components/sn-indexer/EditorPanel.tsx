@@ -40,7 +40,7 @@ const EditorPanel = () => {
     <div className="flex flex-col h-full">
       <h2 className="text-2xl font-bold mb-4">SQL Editor</h2>
       <Editor
-        height="40%"
+        height="50%"
         defaultLanguage="sql"
         value={query}
         onChange={(value) => setQuery(value || "")}
