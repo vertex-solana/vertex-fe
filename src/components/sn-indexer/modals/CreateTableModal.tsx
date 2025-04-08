@@ -50,7 +50,6 @@ const formSchema = z.object({
   schema: z
     .array(schemaFieldSchema)
     .min(1, "At least one schema field is required."),
-  accountId: z.number().min(1, "Account ID is required."),
 });
 
 interface CreateTableModalProps {
@@ -71,7 +70,6 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
     defaultValues: {
       tableName: "",
       schema: [{ name: "", type: "varchar", nullable: false }],
-      accountId: 0,
     },
   });
 
@@ -79,6 +77,10 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
     control: form.control,
     name: "schema",
   });
+
+  const onErrorSubmit = (errors: any) => {
+    toast.error(`Please fix the errors in the form. ${errors}`);
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -92,7 +94,6 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
           type: field.type,
           nullable: field.nullable,
         })),
-        accountId: values.accountId,
       };
 
       await axios.post(
@@ -103,7 +104,6 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
       toast.success("Table created successfully!");
       onClose();
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Failed to create table. Please try again.");
     } finally {
       setIsLoading(false);
@@ -119,7 +119,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
     >
       <div className="space-y-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit, onErrorSubmit)}>
             <div className="space-y-4">
               <FormField
                 control={form.control}

@@ -162,6 +162,7 @@ interface SchemaField {
 }
 
 export interface IndexerTableMetadata {
+  id: number;
   tableName: string;
   fullTableName: string;
   schema: SchemaField[];
@@ -172,4 +173,18 @@ export interface ExecuteQueryResponse {
   query: string;
   schema: { [key: string]: any };
   rows: { [key: string]: any }[];
+}
+
+export interface TransformerPda {
+  script: string;
+}
+
+export interface TriggerAndTransformer {
+  triggerType: string;
+  pdaPubkey: string;
+  pdaName: string;
+  transformerPdaId: number;
+  transformerPda: TransformerPda;
+  indexerTableId: number;
+  indexerId: number;
 }

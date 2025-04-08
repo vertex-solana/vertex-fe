@@ -45,6 +45,7 @@ const ViewData: FC<ViewDataProps> = ({ indexerId }) => {
   return (
     <div className="flex h-full w-full">
       <div className="w-1/3 p-4 overflow-auto border-r border-gray-700">
+        {/** TODO: Make the tabs for select all the indexer table public and LLM for analysis data*/}
         <h2 className="text-2xl font-bold mb-6">Tables for Indexer</h2>
         {tables.length === 0 ? (
           <div>No tables found for this indexer.</div>
