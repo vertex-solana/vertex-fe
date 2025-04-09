@@ -136,9 +136,9 @@ export default function Header() {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn ? (
-              <div>
+              <>
                 <Button
                   size="lg"
                   className="group"
@@ -153,7 +153,7 @@ export default function Header() {
                 <Button size="lg" className="group" onClick={handleSignOut}>
                   Sign Out
                 </Button>
-              </div>
+              </>
             ) : (
               <Button size="lg" className="group" onClick={handleSignIn}>
                 Sign In with Google
