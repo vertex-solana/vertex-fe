@@ -155,6 +155,10 @@ export enum EclipseSupportedTokenEnum {
 }
 
 // Start for Vertex
+export enum TriggerType {
+  WS = "WS",
+}
+
 interface SchemaField {
   name: string;
   type: string;

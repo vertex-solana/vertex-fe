@@ -6,6 +6,7 @@ import { CreateTableModal } from "./modals/CreateTableModal";
 import { IndexerTableMetadata } from "@/models/app.model";
 import TableStructure from "./TableStructure";
 import axios from "axios";
+import CreateTriggerModal from "./modals/CreateTriggerModal";
 
 interface TablesAndTriggersViewProps {
   indexerId: number;
@@ -15,6 +16,8 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
   indexerId,
 }) => {
   const [isOpenModalCreateTable, setIsOpenModalCreateTable] = useState(false);
+  const [isOpenModalCreateTrigger, setIsOpenModalCreateTrigger] =
+    useState(false);
   const [tables, setTables] = useState<IndexerTableMetadata[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +57,9 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
           <Button onClick={() => setIsOpenModalCreateTable(true)}>
             Create Table
           </Button>
-          <Button>Create Trigger</Button>
+          <Button onClick={() => setIsOpenModalCreateTrigger(true)}>
+            Create Trigger
+          </Button>
         </div>
       </div>
       <p className="text-gray-400">
@@ -66,6 +71,15 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
           indexerId={indexerId}
           isOpen={isOpenModalCreateTable}
           onClose={() => setIsOpenModalCreateTable(false)}
+        />
+      )}
+
+      {isOpenModalCreateTrigger && (
+        <CreateTriggerModal
+          indexerId={indexerId}
+          tables={tables}
+          isOpen={isOpenModalCreateTrigger}
+          onClose={() => setIsOpenModalCreateTrigger(false)}
         />
       )}
 
