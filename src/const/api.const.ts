@@ -29,3 +29,5 @@ export const CREATE_TABLE = (indexerId: number) =>
   `/indexers/${indexerId}/tables/create`;
 export const CREATE_TRIGGER_TRANSFORMER = (indexerId: number) =>
   `/indexers/${indexerId}/register`;
+
+export const UPLOAD_IDL = "/idl-dapp/upload";

@@ -7,6 +7,7 @@ import { IdlDapp } from "@/models/app.model";
 import { axiosInstance } from "@/services/config";
 import { useEffect, useState } from "react";
 import IdlView from "@/components/sn-idl/modal/IdlView";
+import { UploadIdlModal } from "@/components/sn-idl/modal/UploadIdlModal";
 
 const IDL = () => {
   const onOpen = useStoreModal((state) => state.onOpen);
@@ -14,6 +15,7 @@ const IDL = () => {
   const [idls, setIdls] = useState<IdlDapp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIdl, setSelectedIdl] = useState<IdlDapp | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchIdls = async () => {
@@ -32,7 +34,7 @@ const IDL = () => {
       }
     };
     fetchIdls();
-  }, [onOpen]);
+  }, [onOpen, isUploadModalOpen]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -64,14 +66,18 @@ const IDL = () => {
         </div>
       </div>
       <Button
-        className="w-[100px] fixed bottom-4 right-4 z-40" 
-        onClick={() => console.log("Upload IDL clicked")}
+        className="w-[100px] fixed bottom-4 right-4 z-40"
+        onClick={() => setIsUploadModalOpen(true)}
       >
         Upload IDL
       </Button>
       {selectedIdl && (
         <IdlView idl={selectedIdl.idlJson} onClose={handleCloseModal} />
       )}
+      <UploadIdlModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+      />
     </div>
   );
 };
