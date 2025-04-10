@@ -28,6 +28,11 @@ const navigationItems: NavItem[] = [
   },
 ];
 
+const navigationIndexer: NavItem[] = [
+  { label: "Indexer", href: "/indexers" },
+  { label: "IDL", href: "/idls" },
+];
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -112,29 +117,45 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8 text-sm font-medium">
-            {navigationItems.map((item) =>
-              item.isExternal ? (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition"
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="text-muted-foreground hover:text-foreground transition"
-                >
-                  {item.label}
-                </a>
-              )
-            )}
-          </nav>
+          {pathName === "/" ? (
+            <nav className="hidden md:flex space-x-8 text-sm font-medium">
+              {navigationItems.map((item) =>
+                item.isExternal ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-foreground transition"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className="text-muted-foreground hover:text-foreground transition"
+                  >
+                    {item.label}
+                  </a>
+                )
+              )}
+            </nav>
+          ) : (
+            <div>
+              <nav className="hidden md:flex space-x-8 text-sm font-medium">
+                {navigationIndexer.map((item) => (
+                  <div
+                    key={item.label}
+                    onClick={() => router.push(item.href)}
+                    className="text-muted-foreground hover:text-foreground transition hover:cursor-pointer"
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </nav>
+            </div>
+          )}
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4 ">

@@ -1,3 +1,6 @@
+import { Idl } from "@coral-xyz/anchor";
+import { Idl as IdlV30 } from "anchor-v30";
+
 export interface UserInfoInterface {
   userName?: string;
   address?: string;
@@ -46,4 +49,12 @@ export interface TriggerAndTransformer {
   transformerPda: TransformerPda;
   indexerTableId: number;
   indexerId: number;
+}
+
+export interface IdlDapp {
+  id: number;
+  name: string;
+  version: string;
+  idlJson: Idl | IdlV30;
+  programId: string;
 }

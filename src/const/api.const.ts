@@ -17,6 +17,7 @@ export const STT_NOT_MODIFIED = 304;
 
 // API Path
 export const GET_INDEXERS = "/indexers";
+export const GET_IDLS = "/idl-dapp";
 
 export const EXECUTE_QUERY = "/indexers/query";
 export const GET_TABLES_INDEXER = (indexerId: number) =>
