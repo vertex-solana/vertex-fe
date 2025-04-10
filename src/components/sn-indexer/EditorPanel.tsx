@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
 import { ExecuteQueryResponse } from "@/models/app.model";
 import { isNil } from "lodash";
 import DataViewManager from "./DataViewmanager";
+import { axiosInstance } from "@/services/config";
+import { EXECUTE_QUERY } from "@/const/api.const";
 
 const EditorPanel = () => {
   const [query, setQuery] = useState<string>(
@@ -18,15 +19,7 @@ const EditorPanel = () => {
   const executeQuery = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/indexers/query",
-        { query },
-        {
-          headers: {
-            Authorization: `Bearer YOUR_AUTH_TOKEN`,
-          },
-        }
-      );
+      const response = await axiosInstance.post(EXECUTE_QUERY);
 
       setResult(response?.data?.data || null);
     } catch (error) {

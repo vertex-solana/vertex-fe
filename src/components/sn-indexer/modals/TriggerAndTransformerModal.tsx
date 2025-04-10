@@ -2,9 +2,10 @@
 
 import { FC, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
-import axios from "axios";
 import { TriggerAndTransformer } from "@/models/app.model";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { axiosInstance } from "@/services/config";
+import { GET_TRIGGER_TRANSFORMER } from "@/const/api.const";
 
 const dummyData = [
   {
@@ -53,8 +54,8 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const triggersAndTransformersResponse = await axios.get(
-          `http://localhost:3000/api/indexers/${indexerId}/tables/${tableId}/trigger-transformer`
+        const triggersAndTransformersResponse = await axiosInstance.get(
+          GET_TRIGGER_TRANSFORMER(indexerId, tableId)
         );
         const data = triggersAndTransformersResponse?.data
           ?.data as TriggerAndTransformer[];

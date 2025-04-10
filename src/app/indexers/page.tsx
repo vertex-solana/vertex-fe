@@ -2,8 +2,9 @@
 
 import { useStoreModal } from "@/hooks/use-store-modal";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { axiosInstance } from "@/services/config";
 import IndexerItem from "@/components/sn-indexer/IndexerItem";
+import { GET_INDEXERS } from "@/const/api.const";
 
 const Indexer = () => {
   const onOpen = useStoreModal((state) => state.onOpen);
@@ -17,12 +18,7 @@ const Indexer = () => {
   useEffect(() => {
     const fetchIndexers = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/indexers", {
-          headers: {
-            Authorization: `Bearer YOUR_AUTH_TOKEN`,
-          },
-        });
-
+        const response = await axiosInstance.get(GET_INDEXERS);
         const data = response?.data?.data;
         if (data.length === 0) {
           onOpen();

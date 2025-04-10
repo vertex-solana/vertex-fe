@@ -5,7 +5,6 @@ import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import axios from "axios";
 
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/button";
@@ -25,6 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { axiosInstance } from "@/services/config";
+import { CREATE_TABLE } from "@/const/api.const";
 
 const TypeColumn = [
   "varbinary",
@@ -96,10 +97,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
         })),
       };
 
-      await axios.post(
-        `http://localhost:3000/api/indexers/${indexerId}/tables/create`,
-        payload
-      );
+      await axiosInstance.post(CREATE_TABLE(indexerId), payload);
 
       toast.success("Table created successfully!");
       onClose();

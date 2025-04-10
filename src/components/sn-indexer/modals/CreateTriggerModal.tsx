@@ -23,9 +23,10 @@ import Editor from "@monaco-editor/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios from "axios";
 import { toast } from "react-hot-toast";
 import { IndexerTableMetadata, TriggerType } from "@/models/app.model";
+import { axiosInstance } from "@/services/config";
+import { CREATE_TRIGGER_TRANSFORMER } from "@/const/api.const";
 
 const triggerSchema = z.object({
   tableId: z.string().min(1, "Table is required."),
@@ -85,16 +86,7 @@ const CreateTriggerModal = ({
       const blob = new Blob([transformCode], { type: "text/javascript" });
       formData.append("transformer", blob, "transform.js");
 
-      await axios.post(
-        `http://localhost:3000/api/indexers/${indexerId}/register`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer YOUR_AUTH_TOKEN`,
-          },
-        }
-      );
+      await axiosInstance.post(CREATE_TRIGGER_TRANSFORMER(indexerId), formData);
 
       toast.success("Trigger created successfully!");
       onClose();

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Link } from "wouter";
+import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import {
   Sheet,
@@ -34,6 +33,8 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
+  const pathName = usePathname();
+
   useEffect(() => {
     const token = Cookies.get("token");
     setIsLoggedIn(!!token);
@@ -63,7 +64,7 @@ export default function Header() {
   }, []);
 
   const handleSignIn = () => {
-    window.location.href = "http://localhost:3000/api/auth/google/login";
+    window.location.href = `${process.env.SERVICE_URL}/auth/google/login`;
   };
 
   const handleSignOut = () => {
@@ -102,11 +103,12 @@ export default function Header() {
                 <line x1="12" y1="8.5" x2="22" y2="15.5"></line>
               </svg>
             </div>
-            <Link href="/">
-              <a className="font-bold text-xl tracking-tight">
-                Sol Index Protocol
-              </a>
-            </Link>
+            <div
+              className="font-bold text-xl tracking-tight cursor-pointer"
+              onClick={() => router.push("/")}
+            >
+              Sol Index Protocol
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -138,16 +140,18 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn ? (
               <>
-                <Button
-                  size="lg"
-                  className="group"
-                  onClick={() => {
-                    router.push("/indexer");
-                  }}
-                >
-                  Create Indexer
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </Button>
+                {pathName !== "/indexers" && (
+                  <Button
+                    size="lg"
+                    className="group"
+                    onClick={() => {
+                      router.push("/indexers");
+                    }}
+                  >
+                    Create Indexer
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                )}
 
                 <Button size="lg" className="group" onClick={handleSignOut}>
                   Sign Out
