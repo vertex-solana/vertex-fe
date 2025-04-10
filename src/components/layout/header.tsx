@@ -70,7 +70,7 @@ export default function Header() {
   const handleSignOut = () => {
     Cookies.remove("token");
     setIsLoggedIn(false);
-    router.refresh();
+    router.push("/");
   };
 
   return (
