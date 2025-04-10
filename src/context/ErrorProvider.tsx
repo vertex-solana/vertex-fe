@@ -2,13 +2,17 @@
 
 import React, { useContext, useState } from 'react';
 import { twJoin } from 'tailwind-merge';
-import { CommonDialog } from '@/components/common';
 
 const INITIAL_STATE = {} as any;
 
 const ErrorContext = React.createContext(INITIAL_STATE);
 
 export const useErrorContext = () => useContext(ErrorContext);
+
+const DEFAULT_ERROR_CONNECT_DATA = {
+  title: '',
+  message: '',
+};
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [errorData, setErrorData] = useState(DEFAULT_ERROR_CONNECT_DATA);
@@ -32,10 +36,7 @@ interface ErrorProviderProps {
   children: React.ReactNode;
 }
 
-const DEFAULT_ERROR_CONNECT_DATA = {
-  title: '',
-  message: '',
-};
+import { CommonDialog } from '@/components/common';
 
 const ErrorDialog: React.FC<ErrorConnectDialogProps> = ({
   isOpen,

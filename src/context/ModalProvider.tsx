@@ -18,9 +18,5 @@ export const ModalProvider = () => {
     return null;
   }
 
-  return (
-    <>
-      <StoreModal />
-    </>
-  );
+  return <StoreModal />;
 };

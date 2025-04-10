@@ -3,7 +3,7 @@
 import React, { useState, ComponentPropsWithoutRef } from "react";
 
 import { useWindowSize } from "@/hooks";
-import { usePathname } from "next/navigation";
+// import { usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import { twJoin, twMerge } from "tailwind-merge";
 import { HamburgerIcon } from "@/components/icons";
@@ -105,9 +105,10 @@ export const NavigationItem: React.FC<NavigationItemProps> = ({
   disabled = false,
   ...otherProps
 }) => {
-  const pathname = usePathname();
+  // const pathname = usePathname();
 
-  const active = isActive || pathname === href;
+  const active = isActive 
+    // || pathname === href;
 
   return (
     <Link

@@ -1,5 +1,4 @@
 import { web3 } from "@project-serum/anchor";
-import { SupportedChainEnum } from "@/models/app.model";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { PriorityLevel } from "./sol-blockchain-service/type";
 import { TransactionWithSigners } from "@/models/common.model";
@@ -10,18 +9,10 @@ export interface BlockchainServiceInterface {
   getTransactionResult(
     getTransactionResultData: ReqGetTransactionResultInterface
   ): Promise<BlockchainTransactionStatusEnum>;
-  getEdasBalance?: (walletAddress: string) => Promise<number>;
 }
 
-export const getBlockchainServiceByChain = (chain: SupportedChainEnum) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-    case SupportedChainEnum.Eclipse:
-      return new SolBlockchainService();
-
-    default:
-      return null;
-  }
+export const getBlockchainServiceByChain = () => {
+  return new SolBlockchainService();
 };
 
 export interface ResSendTransactionInterface {
@@ -39,7 +30,6 @@ export interface ReqSendTransactionInterface {
   walletAddress?: string;
   getLabel?: any;
   priorityLevel?: PriorityLevel;
-  selectedChain?: SupportedChainEnum;
 }
 
 export interface ReqGetTransactionResultInterface {

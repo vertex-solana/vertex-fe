@@ -61,11 +61,6 @@ export enum ProgressSendTxStatusEnum {
   FAILED = "failed",
 }
 
-export enum TransactionTypeEnum {
-  LENDING = "LENDING",
-  LIQUIDITY = "LIQUIDITY",
-}
-
 export enum SocialPlatformEnum {
   TWITTER = "TWITTER",
 }

@@ -11,7 +11,7 @@ import {
 import { CommonUtils } from "@/utils";
 import { useTranslation } from "react-i18next";
 import { twJoin, twMerge } from "tailwind-merge";
-import { BlockchainTransactionStatusEnum, SupportedChainEnum } from "@/models";
+import { BlockchainTransactionStatusEnum } from "@/models";
 
 import CommonToast from "./common-toast";
 
@@ -19,7 +19,6 @@ const CommonTransactionToast: React.FC<CommonTransactionToastProps> = ({
   status,
   children,
 
-  selectedChain,
   transactionHash,
   contentClassName,
 
@@ -90,10 +89,7 @@ const CommonTransactionToast: React.FC<CommonTransactionToastProps> = ({
               "flex items-center gap-x-1",
               "text-primary5 font-semibold"
             )}
-            href={CommonUtils.getTransactionHashInfoLink(
-              selectedChain,
-              transactionHash || ""
-            )}
+            href={CommonUtils.getTransactionHashInfoLink(transactionHash || "")}
             target="_blank"
           >
             {getLabel("lViewYourTransaction")}
@@ -115,7 +111,6 @@ interface CommonTransactionToastProps
   extends React.ComponentPropsWithoutRef<"div"> {
   status?: BlockchainTransactionStatusEnum;
 
-  selectedChain: SupportedChainEnum;
   transactionHash?: string;
   contentClassName?: string;
   onCloseCallback?: () => void;

@@ -33,7 +33,7 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({
   className,
   ...otherProps
 }) => {
-  const { accountInfo } = useAuthContext();
+  // const { accountInfo } = useAuthContext();
   return (
     <div
       className={twMerge("flex items-center gap-x-2", className)}
@@ -50,7 +50,8 @@ export const AccountInfo: React.FC<AccountInfoProps> = ({
       </div>
 
       <p className="font-medium text-sm">
-        {accountInfo && CommonUtils.truncateEmail(accountInfo.account.email)}
+        {/* {accountInfo && CommonUtils.truncateEmail(accountInfo.account.email)} */}
+        user@gmail.com
       </p>
     </div>
   );

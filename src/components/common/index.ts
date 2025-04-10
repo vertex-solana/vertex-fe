@@ -4,7 +4,6 @@ import CommonDialog from "./common-dialog";
 import CommonButton from "./common-button";
 import CommonSwiper from "./common-swiper";
 import CommonTooltip from "./common-tooltip";
-import SelectedChainTabs from "./SelectedChainTabs";
 import CommonToggleButton from "./CommonToggleButton";
 import CommonTransactionToast from "./CommonTransactionToast";
 import {
@@ -46,7 +45,6 @@ export {
   CommonTooltip,
   DropdownTrigger,
   DropdownContent,
-  SelectedChainTabs,
   CommonToggleButton,
   CommonTransactionToast,
 };

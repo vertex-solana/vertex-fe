@@ -4,7 +4,6 @@ import {
 } from "..";
 
 import { BlockChainUtils } from "@/utils";
-import { getEdasBalance } from "./get-token-balance";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { getTransactionResult } from "./get-transaction-result";
 
@@ -22,12 +21,6 @@ export class SolBlockchainService implements BlockchainServiceInterface {
       ...getTransactionResultData,
       rpcEndpoint,
     });
-
-    return result;
-  }
-
-  async getEdasBalance(walletAddress: string): Promise<number> {
-    const result = await getEdasBalance(walletAddress);
 
     return result;
   }

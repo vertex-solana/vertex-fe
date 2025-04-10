@@ -1,25 +1,17 @@
 import { ImageAssets } from "public";
 import { AppConstant } from "@/const";
 import { ApiResponse } from "apisauce";
-import {
-  EclipseSupportedTokenEnum,
-  NetworkModeEnum,
-  SolanaSupportedTokenEnum,
-  SupportedChainEnum,
-  SupportTokenType,
-} from "@/models";
-import { StaticImageData } from "next/image";
 import { isEmpty } from "lodash";
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const formatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
+export const formatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
 });
 
 export const uuid = (): string => {
@@ -76,13 +68,6 @@ export const getDappServicesResponseData = <T>(
   }
 };
 
-export const getChainImageSrcByValue = (value: SupportedChainEnum) => {
-  switch (value) {
-    default:
-      return "";
-  }
-};
-
 export const truncateHash = (
   address?: string,
   startLength = 5,
@@ -99,86 +84,6 @@ export const toHexString = (bytes: any) =>
     (str: any, byte: any) => str + byte.toString(16).padStart(2, "0"),
     ""
   );
-
-export const getStorageAddressByChain = (chain: SupportedChainEnum) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-      return {
-        keyAddress: AppConstant.KEY_SOL_WALLET_ADDRESS,
-        storageWalletAddress: localStorage.getItem(
-          AppConstant.KEY_SOL_WALLET_ADDRESS
-        ),
-      };
-
-    case SupportedChainEnum.Eclipse:
-      return {
-        keyAddress: AppConstant.KEY_ECLIPSE_WALLET_ADDRESS,
-        storageWalletAddress: localStorage.getItem(
-          AppConstant.KEY_ECLIPSE_WALLET_ADDRESS
-        ),
-      };
-
-    case SupportedChainEnum.Sui:
-      return {
-        keyAddress: AppConstant.KEY_SUI_WALLET_ADDRESS,
-        storageWalletAddress: localStorage.getItem(
-          AppConstant.KEY_SUI_WALLET_ADDRESS
-        ),
-      };
-
-    case SupportedChainEnum.Movement:
-      return {
-        keyAddress: AppConstant.KEY_MOVEMENT_WALLET_ADDRESS,
-        storageWalletAddress: localStorage.getItem(
-          AppConstant.KEY_MOVEMENT_WALLET_ADDRESS
-        ),
-      };
-
-    case SupportedChainEnum.Soon:
-      return {
-        keyAddress: AppConstant.KEY_SOON_WALLET_ADDRESS,
-        storageWalletAddress: localStorage.getItem(
-          AppConstant.KEY_SOON_WALLET_ADDRESS
-        ),
-      };
-
-    default:
-      return {
-        keyAddress: "",
-        storageWalletAddress: "",
-      };
-  }
-};
-
-export const getStorageWalletAppByChain = (chain: SupportedChainEnum) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-      return {
-        keyWalletApp: AppConstant.KEY_SOL_WALLET_APP,
-        storageWalletApp: localStorage.getItem(AppConstant.KEY_SOL_WALLET_APP),
-      };
-
-    case SupportedChainEnum.Eclipse:
-      return {
-        keyWalletApp: AppConstant.KEY_ECLIPSE_WALLET_APP,
-        storageWalletApp: localStorage.getItem(
-          AppConstant.KEY_ECLIPSE_WALLET_APP
-        ),
-      };
-
-    case SupportedChainEnum.Soon:
-      return {
-        keyWalletApp: AppConstant.KEY_SOON_WALLET_APP,
-        storageWalletApp: localStorage.getItem(AppConstant.KEY_SOON_WALLET_APP),
-      };
-
-    default:
-      return {
-        keyWalletApp: "",
-        storageWalletApp: "",
-      };
-  }
-};
 
 export async function retry<T>(
   fn: () => Promise<T>,
@@ -210,44 +115,12 @@ export const wait = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export const getTransactionHashInfoLink = (
-  chain: SupportedChainEnum | undefined,
-  transactionHash: string
-) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-      const solanaParams =
-        process.env.NETWORK_MODE !== NetworkModeEnum.MAIN_NET
-          ? `?cluster=${process.env.NETWORK_MODE}`
-          : "";
-      return `${process.env.NEXT_PUBLIC_SOLS_EXPLORER_URL}/tx/${transactionHash}/${solanaParams}`;
-
-    case SupportedChainEnum.Eclipse:
-      const eclipseParams =
-        process.env.NETWORK_MODE === NetworkModeEnum.MAIN_NET
-          ? ""
-          : `?cluster=${NetworkModeEnum.TEST_NET}`;
-      return `${process.env.NEXT_PUBLIC_ECLIPSE_EXPLORER_URL}/tx/${transactionHash}/${eclipseParams}`;
-
-    case SupportedChainEnum.Soon:
-      return `${process.env.NEXT_PUBLIC_SOON_EXPLORER_URL}/${transactionHash}`;
-
-    case SupportedChainEnum.Sui:
-      return `${
-        process.env.NETWORK_MODE === NetworkModeEnum.MAIN_NET
-          ? process.env.NEXT_PUBLIC_SUI_EXPLORER_URL
-          : addSubdomain(
-              process.env.NEXT_PUBLIC_SUI_EXPLORER_URL,
-              NetworkModeEnum.TEST_NET
-            )
-      }/txblock/${transactionHash}`;
-
-    case SupportedChainEnum.Movement:
-      return `${process.env.NEXT_PUBLIC_APTOS_MOVEMENT_EXPLORER_URL}/${transactionHash}?network=${process.env.NETWORK_MODE}`;
-
-    default:
-      return "";
-  }
+export const getTransactionHashInfoLink = (transactionHash: string) => {
+  const solanaParams =
+    process.env.NETWORK_MODE !== "mainnet"
+      ? `?cluster=${process.env.NETWORK_MODE}`
+      : "";
+  return `${process.env.NEXT_PUBLIC_SOLS_EXPLORER_URL}/tx/${transactionHash}/${solanaParams}`;
 };
 
 export function addSubdomain(url?: string, subdomain?: string) {
@@ -292,30 +165,6 @@ export const stringHashToNumber = (str: string) => {
     hash = hash % 10;
   }
   return hash;
-};
-
-export const getChainBaseToken = (chain: SupportedChainEnum) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-      return SolanaSupportedTokenEnum.SOL;
-    case SupportedChainEnum.Eclipse:
-      return EclipseSupportedTokenEnum.ETH;
-    default:
-      return SolanaSupportedTokenEnum.SOL;
-  }
-};
-
-export const getTokenImageSrcByValue = (value: SupportTokenType) => {
-  switch (value) {
-    case SolanaSupportedTokenEnum.SOL:
-      return ImageAssets.SolTokenImage;
-
-    case EclipseSupportedTokenEnum.ETH:
-      return ImageAssets.EthTokenImage;
-
-    default:
-      return "";
-  }
 };
 
 export const truncateEmail = (email: string): string => {

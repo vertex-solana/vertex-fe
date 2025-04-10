@@ -1,6 +1,6 @@
 import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
-import { SolanaWalletsEnum, SupportedChainEnum } from "@/models";
+import { SolanaWalletsEnum } from "@/models";
 import { PublicKey } from "@solana/web3.js";
 
 export const getSolanaWalletsProvider = (solWallet: SolanaWalletsEnum) => {
@@ -22,18 +22,6 @@ export const getSolanaWalletsProvider = (solWallet: SolanaWalletsEnum) => {
   }
 };
 
-export const getSVMRpcEndpoint = (chain: SupportedChainEnum) => {
-  switch (chain) {
-    case SupportedChainEnum.Solana:
-      return getSolanaRpcEndpoint();
-    case SupportedChainEnum.Eclipse:
-      return getEclipseRpcEndpoint();
-
-    default:
-      return getSolanaRpcEndpoint();
-  }
-};
-
 export const getSolanaRpcEndpoint = (rpcUrl?: string): string => {
   if (rpcUrl) return rpcUrl;
 
@@ -41,19 +29,13 @@ export const getSolanaRpcEndpoint = (rpcUrl?: string): string => {
 
   let mode = "devnet";
 
-  if (process.env.NETWORK_MODE === "devnet") {
-    mode = "devnet";
-  } else if (process.env.NETWORK_MODE === "testnet") {
-    mode = "devnet";
+  if (process.env.NETWORK_MODE === "testnet") {
+    mode = "testnet";
   } else {
     mode = "mainnet-beta";
   }
 
   return web3.clusterApiUrl(mode as web3.Cluster);
-};
-
-export const getEclipseRpcEndpoint = (): string => {
-  return process.env.ECLIPSE_RPC_URL || "";
 };
 
 export const getSolanaNativeTokenBalance = async (

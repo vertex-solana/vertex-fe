@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Link } from "wouter";
 import Cookies from "js-cookie";
 import {
@@ -33,7 +33,6 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
-  const pathName = usePathname();
 
   useEffect(() => {
     const token = Cookies.get("token");

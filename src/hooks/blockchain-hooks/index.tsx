@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AppConstant } from "@/const";
 import { web3 } from "@project-serum/anchor";
+import { BlockchainTransactionStatusEnum } from "@/models";
 import { BlockchainService } from "@/services";
-import { SupportedChainEnum, BlockchainTransactionStatusEnum } from "@/models";
 
 import useSolanaTransaction from "./useSolanaTransaction";
 
@@ -16,15 +16,12 @@ const useTransaction = () => {
   >(undefined);
 
   const handleSendTransaction = async (
-    selectedChain: SupportedChainEnum,
     data: web3.Transaction | web3.Transaction[] | any // NOTE: Update additional type when implement new chain
   ) => {
     try {
       let resTransaction = { txHash: "", messageError: "" };
 
-      if (selectedChain === SupportedChainEnum.Solana) {
-        resTransaction = await handleSendSolanaTransaction(data);
-      }
+      resTransaction = await handleSendSolanaTransaction(data);
 
       if (resTransaction.messageError) {
         if (
@@ -51,19 +48,19 @@ const useTransaction = () => {
   };
 
   const handleGetTransactionResult = async (
-    chain: SupportedChainEnum,
     txHash: string,
     rpcUrl?: string
   ) => {
     try {
       let txStatus = BlockchainTransactionStatusEnum.LOADING;
 
-      txStatus = (await BlockchainService.getBlockchainServiceByChain(
-        chain
-      )?.getTransactionResult({
-        txHash,
-        rpcEndpoint: rpcUrl,
-      })) as BlockchainTransactionStatusEnum;
+      txStatus =
+        (await BlockchainService.getBlockchainServiceByChain()?.getTransactionResult(
+          {
+            txHash,
+            rpcEndpoint: rpcUrl,
+          }
+        )) as BlockchainTransactionStatusEnum;
 
       setTransactionStatus(txStatus);
       return txStatus as BlockchainTransactionStatusEnum;

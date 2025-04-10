@@ -2,15 +2,12 @@
 
 import React, { Fragment } from "react";
 
-import { ImageAssets } from "public";
 import { twJoin } from "tailwind-merge";
 import { useWindowSize } from "@/hooks";
 import { AppConstant, PathConstant } from "@/const";
 import { DesktopNavigation, NavigationDrawer } from "./navigation";
 
 import Link from "next/link";
-import Image from "next/image";
-import AccountButton from "./account-button";
 
 const MainLayoutHeader = () => {
   const { windowWidth } = useWindowSize();
@@ -38,9 +35,7 @@ const MainLayoutHeader = () => {
               <Link
                 href={PathConstant.ROOT}
                 className="flex items-center gap-x-2"
-              >
-
-              </Link>
+              ></Link>
             ) : (
               <div className="flex items-center gap-x-1">
                 <NavigationDrawer />
@@ -53,11 +48,8 @@ const MainLayoutHeader = () => {
               <Fragment />
             )}
           </div>
-
-          <AccountButton />
         </div>
       </div>
-
     </div>
   );
 };

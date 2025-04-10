@@ -2,9 +2,10 @@ import {
   AppProvider,
   AuthProvider,
   HomeProvider,
-  ErrorProvider,
   SolanaProvider,
 } from "@/context";
+
+import { ErrorProvider } from "@/context/ErrorProvider"; // Direct import
 
 import { twJoin } from "tailwind-merge";
 import { Inter, Kumbh_Sans, Fugaz_One } from "next/font/google";
