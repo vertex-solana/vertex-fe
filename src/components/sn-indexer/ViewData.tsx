@@ -5,6 +5,8 @@ import axios from "axios";
 import { IndexerTableMetadata } from "@/models/app.model";
 import TableStructure from "./TableStructure";
 import EditorPanel from "./EditorPanel";
+import { axiosInstance } from "@/services/config";
+import { GET_TABLES_INDEXER } from "@/const/api.const";
 
 interface ViewDataProps {
   indexerId: number;
@@ -17,14 +19,7 @@ const ViewData: FC<ViewDataProps> = ({ indexerId }) => {
   useEffect(() => {
     const fetchTables = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/indexers/${indexerId}/tables`,
-          {
-            headers: {
-              Authorization: `Bearer YOUR_AUTH_TOKEN`,
-            },
-          }
-        );
+        const response = await axiosInstance.get(GET_TABLES_INDEXER(indexerId));
 
         const data = response?.data.data;
         setTables(data || []);

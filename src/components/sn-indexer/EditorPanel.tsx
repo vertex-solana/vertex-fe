@@ -19,7 +19,7 @@ const EditorPanel = () => {
   const executeQuery = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(EXECUTE_QUERY);
+      const response = await axiosInstance.post(EXECUTE_QUERY, { query });
 
       setResult(response?.data?.data || null);
     } catch (error) {
