@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { GET_IDLS } from "@/const/api.const";
-import { useStoreModal } from "@/hooks/use-store-modal";
 import { IdlDapp } from "@/models/app.model";
 import { axiosInstance } from "@/services/config";
 import { useEffect, useState } from "react";
@@ -10,8 +9,6 @@ import IdlView from "@/components/sn-idl/modal/IdlView";
 import { UploadIdlModal } from "@/components/sn-idl/modal/UploadIdlModal";
 
 const IDL = () => {
-  const onOpen = useStoreModal((state) => state.onOpen);
-
   const [idls, setIdls] = useState<IdlDapp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedIdl, setSelectedIdl] = useState<IdlDapp | null>(null);
@@ -22,11 +19,8 @@ const IDL = () => {
       try {
         const response = await axiosInstance.get(GET_IDLS);
         const data = response?.data?.data;
-        if (data.length === 0) {
-          onOpen();
-        } else {
-          setIdls(data || []);
-        }
+
+        setIdls(data || []);
       } catch (error) {
         console.error("Error fetching Idl:", error);
       } finally {
@@ -34,7 +28,7 @@ const IDL = () => {
       }
     };
     fetchIdls();
-  }, [onOpen, isUploadModalOpen]);
+  }, [isUploadModalOpen]);
 
   if (isLoading) {
     return <div>Loading...</div>;

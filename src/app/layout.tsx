@@ -15,7 +15,6 @@ import MainLayout from "@/components/layout/main-layout";
 import "./globals.css";
 import GoogleAnalytics from "@/components/common/GoogleAnalytics";
 import { ThemeProvider } from "@/context/ThemeProvider";
-import { ModalProvider } from "@/context/ModalProvider";
 import { ToasterProvider } from "@/context/ToastProvider";
 
 const inter = Inter({
@@ -43,7 +42,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         className={twJoin(
           inter.variable,
           kumbhSans.variable,
-          fugazOne.variable,
+          fugazOne.variable
         )}
         suppressHydrationWarning={true}
       >
@@ -59,7 +58,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                       enableSystem
                     >
                       <ToasterProvider />
-                      <ModalProvider />
                       {children}
                     </ThemeProvider>
                   </MainLayout>

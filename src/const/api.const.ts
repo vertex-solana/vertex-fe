@@ -20,6 +20,8 @@ export const GET_INDEXERS = "/indexers";
 export const GET_IDLS = "/idl-dapp";
 
 export const EXECUTE_QUERY = "/indexers/query";
+
+export const CREATE_INDEXER = "/indexers/create";
 export const GET_TABLES_INDEXER = (indexerId: number) =>
   `/indexers/${indexerId}/tables`;
 export const GET_TRIGGER_TRANSFORMER = (indexerId: number, tableId: number) =>

@@ -13,6 +13,13 @@ export enum SolanaWalletsEnum {
   Solflare = "Solflare",
 }
 
+export interface IndexerResponse {
+  id: number;
+  name: string;
+  programId: string;
+  slug: string;
+}
+
 export enum TriggerType {
   WS = "WS",
 }
