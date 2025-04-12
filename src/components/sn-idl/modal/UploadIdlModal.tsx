@@ -102,6 +102,7 @@ export const UploadIdlModal: FC<UploadIdlModalProps> = ({
                 <FormLabel>Program ID:</FormLabel>
                 <FormControl>
                   <Input
+                    className="!focus-visible:outline-none"
                     disabled={isLoading}
                     placeholder="e.g., KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD"
                     {...field}
@@ -164,7 +165,8 @@ export const UploadIdlModal: FC<UploadIdlModalProps> = ({
               ) : (
                 <>
                   <p className="text-sm text-gray-400">
-                    Uploaded File: <span className="font-semibold">{idlFile.name}</span>
+                    Uploaded File:{" "}
+                    <span className="font-semibold">{idlFile.name}</span>
                   </p>
                   <Button
                     variant="outline"

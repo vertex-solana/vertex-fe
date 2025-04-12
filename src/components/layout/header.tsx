@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Menu } from "lucide-react";
+import { twJoin } from "tailwind-merge";
 
 type NavItem = {
   label: string;
@@ -29,6 +30,7 @@ const navigationItems: NavItem[] = [
 ];
 
 const navigationIndexer: NavItem[] = [
+  { label: "Home", href: "/" },
   { label: "Indexer", href: "/indexers" },
   { label: "IDL", href: "/idls" },
 ];
@@ -80,11 +82,7 @@ export default function Header() {
 
   return (
     <header
-      className={`top-0 z-50 w-full border-b transition-colors duration-200 ${
-        isScrolled
-          ? "bg-background/95 backdrop-blur-sm border-border"
-          : "bg-transparent border-transparent"
-      }`}
+      className={`fixed top-0 z-20 w-full border-b transition-colors duration-200 bg-background backdrop-blur-sm border-border`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
@@ -148,7 +146,12 @@ export default function Header() {
                   <div
                     key={item.label}
                     onClick={() => router.push(item.href)}
-                    className="text-muted-foreground hover:text-foreground transition hover:cursor-pointer"
+                    className={twJoin(
+                      " hover:text-foreground transition hover:cursor-pointer",
+                      item.href === pathName
+                        ? "text-[#642bdf]"
+                        : "text-muted-foreground"
+                    )}
                   >
                     {item.label}
                   </div>

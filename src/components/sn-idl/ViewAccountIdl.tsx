@@ -43,7 +43,7 @@ const ViewIdlAccount: FC<ViewIdlAccountProps> = ({ idl }) => {
       <li key={index} className="flex">
         <span className="text-gray-400">{field.name}</span>
         <span className="text-gray-500">:</span>
-        <span className="text-gray-400 mx-2">{showType(field.type)}</span>
+        <span className="!text-primary5 mx-2">{showType(field.type)}</span>
       </li>
     ));
   };
@@ -61,7 +61,7 @@ const ViewIdlAccount: FC<ViewIdlAccountProps> = ({ idl }) => {
       <li key={index} className="flex">
         <span className="text-gray-400">{field.name}</span>
         <span className="text-gray-500">:</span>
-        <span className="text-gray-400 mx-2">{showType(field.type)}</span>
+        <span className="text-primary5 mx-2">{showType(field.type)}</span>
       </li>
     ));
   };

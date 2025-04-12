@@ -12,23 +12,24 @@ import { useRef } from "react";
 // This animation variant is applied to sections as they come into view
 const fadeInUpVariant = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
-    transition: { 
+    transition: {
       duration: 0.5,
-      ease: "easeOut"
-    }
-  }
+      ease: "easeOut",
+    },
+  },
 };
 
 export default function Home() {
   // Add Inter font to document
   useEffect(() => {
     // Load Inter font
-    const fontLink = document.createElement('link');
-    fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap';
-    fontLink.rel = 'stylesheet';
+    const fontLink = document.createElement("link");
+    fontLink.href =
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap";
+    fontLink.rel = "stylesheet";
     document.head.appendChild(fontLink);
 
     // Clean up
@@ -43,7 +44,10 @@ export default function Home() {
   const featuresControls = useAnimation();
 
   const howItWorksRef = useRef(null);
-  const howItWorksInView = useInView(howItWorksRef, { once: true, amount: 0.2 });
+  const howItWorksInView = useInView(howItWorksRef, {
+    once: true,
+    amount: 0.2,
+  });
   const howItWorksControls = useAnimation();
 
   const useCasesRef = useRef(null);
@@ -55,7 +59,10 @@ export default function Home() {
   const pricingControls = useAnimation();
 
   const earlyAccessRef = useRef(null);
-  const earlyAccessInView = useInView(earlyAccessRef, { once: true, amount: 0.2 });
+  const earlyAccessInView = useInView(earlyAccessRef, {
+    once: true,
+    amount: 0.2,
+  });
   const earlyAccessControls = useAnimation();
 
   // Start animations when sections come into view
@@ -66,19 +73,24 @@ export default function Home() {
     if (pricingInView) pricingControls.start("visible");
     if (earlyAccessInView) earlyAccessControls.start("visible");
   }, [
-    featuresInView, featuresControls, 
-    howItWorksInView, howItWorksControls, 
-    useCasesInView, useCasesControls, 
-    pricingInView, pricingControls, 
-    earlyAccessInView, earlyAccessControls
+    featuresInView,
+    featuresControls,
+    howItWorksInView,
+    howItWorksControls,
+    useCasesInView,
+    useCasesControls,
+    pricingInView,
+    pricingControls,
+    earlyAccessInView,
+    earlyAccessControls,
   ]);
 
   return (
     <div className="min-h-screen">
       <main>
         <HeroSection />
-        
-        <motion.div 
+
+        <motion.div
           ref={featuresRef}
           initial="hidden"
           animate={featuresControls}
@@ -86,8 +98,8 @@ export default function Home() {
         >
           <FeaturesSection />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           ref={howItWorksRef}
           initial="hidden"
           animate={howItWorksControls}
@@ -95,8 +107,8 @@ export default function Home() {
         >
           <HowItWorksSection />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           ref={useCasesRef}
           initial="hidden"
           animate={useCasesControls}
@@ -104,8 +116,8 @@ export default function Home() {
         >
           <UseCasesSection />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           ref={pricingRef}
           initial="hidden"
           animate={pricingControls}
@@ -113,8 +125,8 @@ export default function Home() {
         >
           <PricingSection />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           ref={earlyAccessRef}
           initial="hidden"
           animate={earlyAccessControls}

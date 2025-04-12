@@ -16,7 +16,7 @@ export const SORT_DIRECTION = {
   desc: -1,
 };
 
-export const USER_REJECTED_MESSAGE = 'User reject'
+export const USER_REJECTED_MESSAGE = "User reject";
 
 export const BREAK_POINTS = {
   xs: 480,

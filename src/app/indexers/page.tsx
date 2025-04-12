@@ -60,7 +60,7 @@ const Indexer = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col border-t border-gray-700 relative">
+    <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10">
       {indexers.length === 0 ? (
         <div className="flex flex-1 items-center justify-center">
           No indexers found. Please create one.
@@ -87,7 +87,7 @@ const Indexer = () => {
         </div>
       )}
       <Button
-        className="w-[150px] fixed bottom-4 right-4 z-40"
+        className="w-[150px] fixed bottom-4 right-4 z-[200]"
         onClick={() => setIsOpenCreateModal(true)}
       >
         Create Indexer
