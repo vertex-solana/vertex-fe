@@ -18,8 +18,10 @@ export enum SolanaWalletsEnum {
 export interface IndexerResponse {
   id: number;
   name: string;
+  description: string;
   programId: string;
   slug: string;
+  cluster: string;
 }
 
 export enum TriggerType {
@@ -66,4 +68,10 @@ export interface IdlDapp {
   version: string;
   idlJson: Idl | IdlV30;
   programId: string;
+}
+
+export interface RpcResponse {
+  id: number;
+  url: string;
+  cluster: string;
 }

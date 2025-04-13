@@ -17,7 +17,6 @@ import { axiosInstance } from "@/services/config";
 import { UPDATE_USERNAME } from "@/const/api.const";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
-import Cookies from "js-cookie";
 
 interface UpdateUserNameProps {
   isOpen: boolean;
@@ -30,19 +29,9 @@ const UpdateUserName: FC<UpdateUserNameProps> = ({ isOpen, onClose }) => {
 
   const onUpdateUserName = async () => {
     try {
-      const token = Cookies.get("token");
-
-      const response = await axiosInstance.patch(
-        UPDATE_USERNAME,
-        {
-          userName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axiosInstance.patch(UPDATE_USERNAME, {
+        userName,
+      });
       setUserInfo(response.data.data);
       onClose();
       toast.success("User name updated successfully!");

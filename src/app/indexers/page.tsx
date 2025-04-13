@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/services/config";
 import IndexerItem from "@/components/sn-indexer/IndexerItem";
-import { GET_IDLS, GET_INDEXERS } from "@/const/api.const";
-import { IdlDapp, IndexerResponse } from "@/models/app.model";
+import { GET_IDLS, GET_INDEXERS, GET_RPC } from "@/const/api.const";
+import { IdlDapp, IndexerResponse, RpcResponse } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
@@ -15,6 +15,7 @@ import { twJoin } from "tailwind-merge";
 const Indexer = () => {
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDapp[]>([]);
+  const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
   const [selectedIndexerId, setSelectedIndexerId] = useState<number | null>(
     null
   );
@@ -42,6 +43,17 @@ const Indexer = () => {
       }
     };
 
+    const fetchRpcs = async () => {
+      try {
+        const response = await axiosInstance.get(GET_RPC);
+        const data = response?.data?.data;
+        setRpcs(data || []);
+      } catch (error) {
+        console.error("Error fetching RPCs:", error);
+      }
+    };
+
+    fetchRpcs();
     fetchIndexers();
   }, [isOpenCreateModal]);
 
@@ -135,6 +147,7 @@ const Indexer = () => {
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
+          rpcs={rpcs}
         />
       )}
     </div>

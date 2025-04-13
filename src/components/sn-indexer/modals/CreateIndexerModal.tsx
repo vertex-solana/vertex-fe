@@ -24,25 +24,29 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IdlDapp } from "@/models/app.model";
+import { IdlDapp, RpcResponse } from "@/models/app.model";
 import { axiosInstance } from "@/services/config";
 import { CREATE_INDEXER } from "@/const/api.const";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
+  description: z.string().min(1, "Description is required."),
   idlId: z.string().min(1, "IDL is required."),
+  rpcId: z.string().min(1, "RPC is required."),
 });
 
 interface CreateIndexerModalProps {
   isOpen: boolean;
   onClose: () => void;
   idls: IdlDapp[];
+  rpcs: RpcResponse[];
 }
 
 const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
   isOpen,
   onClose,
   idls,
+  rpcs,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -50,7 +54,9 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       idlId: "",
+      rpcId: "",
       name: "",
+      description: "",
     },
   });
 
@@ -61,6 +67,8 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
       const payload = {
         name: values.name.trim(),
         idlId: Number(values.idlId),
+        rpcId: Number(values.rpcId),
+        description: values.description.trim(),
       };
 
       await axiosInstance.post(CREATE_INDEXER, payload);
@@ -105,6 +113,23 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
               />
               <FormField
                 control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description:</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Kamino Indexer"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="idlId"
                 render={({ field }) => (
                   <FormItem>
@@ -125,6 +150,35 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                                 <span className="mx-2 font-bold">
                                   {idl.version}
                                 </span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="rpcId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>RPC:</FormLabel>
+                    <FormControl>
+                      <Select
+                        disabled={isLoading}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a table" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {rpcs.map((rpc) => (
+                            <SelectItem key={rpc.id} value={rpc.id.toString()}>
+                              <div className="flex items-center">
+                                <span>{rpc.cluster}</span>
                               </div>
                             </SelectItem>
                           ))}
