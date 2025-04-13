@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Menu } from "lucide-react";
 import { twJoin } from "tailwind-merge";
+import { jwtDecode } from "jwt-decode";
+import { useAppService } from "@/hooks";
 
 type NavItem = {
   label: string;
@@ -38,6 +40,7 @@ const navigationIndexer: NavItem[] = [
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { handleGetUserInfo } = useAppService();
   const router = useRouter();
 
   const pathName = usePathname();
@@ -52,13 +55,31 @@ export default function Header() {
       Cookies.set("token", accessToken, { expires: 7 });
       setIsLoggedIn(true);
 
-      urlParams.delete("?accessToken");
-      const newUrl = `${window.location.origin}${
-        window.location.pathname
-      }?${urlParams.toString()}`;
+      urlParams.delete("accessToken");
+      const newUrl = `${window.location.origin}${window.location.pathname}${
+        urlParams.toString() ? `?${urlParams.toString()}` : ""
+      }`;
       window.history.replaceState({}, document.title, newUrl);
     }
   }, []);
+
+  useEffect(() => {
+    const fetchUserInfo = async (token: string) => {
+      try {
+        const decoded: { sub: string } = jwtDecode(token);
+        const accountId = parseInt(decoded.sub);
+
+        await handleGetUserInfo(accountId);
+      } catch (error) {
+        console.error("Failed to decode token or fetch user info:", error);
+      }
+    };
+
+    const token = Cookies.get("token");
+    if (isLoggedIn && token) {
+      fetchUserInfo(token);
+    }
+  }, [isLoggedIn]);
 
   // Effect to detect scroll and update header background
   useEffect(() => {
@@ -110,7 +131,7 @@ export default function Header() {
               className="font-bold text-xl tracking-tight cursor-pointer"
               onClick={() => router.push("/")}
             >
-              Sol Index Protocol
+              Vertex
             </div>
           </div>
 

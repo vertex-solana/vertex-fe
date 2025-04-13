@@ -2,9 +2,11 @@ import { Idl } from "@coral-xyz/anchor";
 import { Idl as IdlV30 } from "anchor-v30";
 
 export interface UserInfoInterface {
-  userName?: string;
-  address?: string;
-  email?: string;
+  email: string;
+  userName: string;
+  walletAddress: string;
+  isUpdatedUserName: boolean;
+  createdAt: Date;
 }
 
 export enum SolanaWalletsEnum {

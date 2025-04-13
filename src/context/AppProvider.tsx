@@ -23,7 +23,7 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [isOpenDrawerAccountSetting, setIsOpenDrawerAccountSetting] =
     useState(false);
 
-  const [userInfo, setUserInfo] = useState<UserInfoInterface>({});
+  const [userInfo, setUserInfo] = useState<UserInfoInterface | null>(null);
 
   return (
     <AppContext.Provider
