@@ -66,7 +66,7 @@ const IDL = () => {
   return (
     <div className="flex flex-col pt-10">
       <div className="flex flex-col gap-y-5 sm:gap-y-8 overflow-y-auto">
-        <p className="text-2xl sm:text-[32px] font-bold">Uploaded IDLs</p>
+        <p className="text-2xl sm:text-[32px] font-bold">IDLs</p>
 
         <div className="flex items-center justify-between">
           <p className="text-sm text-white/50 max-w-[50%]">
