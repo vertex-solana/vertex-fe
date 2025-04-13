@@ -154,7 +154,7 @@ const IDLCard: FC<IDLCardProps> = ({
         </p>
 
         <button
-          className="text-center w-full text-sm py-2 bg-[#642bdf] rounded-lg mt-4"
+          className="text-center w-full text-sm py-2 bg-[#642bdf] rounded-lg mt-4 hover:cursor-pointer"
           onClick={onViewDetail}
         >
           View

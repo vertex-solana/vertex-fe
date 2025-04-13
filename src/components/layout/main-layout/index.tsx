@@ -29,7 +29,7 @@ const MainLayout: FC<ComponentPropsWithoutRef<"div">> = ({
           pathName !== "/" && "sm:max-w-[1376px]"
         )}
       >
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(148,163,184,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30 -z-1"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(148,163,184,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30 -z-[1]"></div>
         {children}
       </div>
       {pathName === "/" && <Footer />}
