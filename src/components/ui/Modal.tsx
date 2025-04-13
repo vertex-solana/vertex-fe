@@ -7,10 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ReactNode } from "react";
 
 interface ModalProps {
-  title: string;
-  description: string;
+  title: ReactNode;
+  description: ReactNode;
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
