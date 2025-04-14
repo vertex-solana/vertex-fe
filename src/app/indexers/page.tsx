@@ -112,22 +112,26 @@ const Indexer = () => {
           </div>
           {updatedIndexers.length > 0 ? (
             <div className="w-full ">
-              <div className="flex items-center w-full grid grid-cols-[35%_65%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
+              <div className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
                 <p>Name</p>
-                <p>Program ID</p>
+                <p>Description</p>
+                <p>Cluster</p>
               </div>
               <div className="flex flex-col sm:h-[330px] overflow-y-auto">
                 {updatedIndexers?.map((indexer) => (
                   <div
                     key={indexer.id}
-                    className="flex items-center w-full grid grid-cols-[35%_65%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
+                    className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
                   >
                     <p>{indexer.name}</p>
                     <button onClick={() => setSelectedIndexerId(indexer.id)}>
                       <p className="text-primary5 text-start truncate">
-                        {indexer.programId}
+                        {indexer.description}
                       </p>
                     </button>
+                    <p className="text-primary5 text-start truncate">
+                      {indexer.cluster}
+                    </p>
                   </div>
                 ))}
               </div>
