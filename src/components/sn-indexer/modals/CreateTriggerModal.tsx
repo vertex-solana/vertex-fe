@@ -86,7 +86,15 @@ const CreateTriggerModal = ({
       const blob = new Blob([transformCode], { type: "text/javascript" });
       formData.append("transformer", blob, "transform.js");
 
-      await axiosInstance.post(CREATE_TRIGGER_TRANSFORMER(indexerId), formData);
+      await axiosInstance.post(
+        CREATE_TRIGGER_TRANSFORMER(indexerId),
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       toast.success("Trigger created successfully!");
       onClose();
