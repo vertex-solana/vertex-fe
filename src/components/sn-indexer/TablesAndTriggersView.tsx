@@ -38,7 +38,7 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
     };
 
     fetchTables();
-  }, [indexerId]);
+  }, [indexerId, isOpenModalCreateTable, isOpenModalCreateTrigger]);
 
   if (isLoading) {
     return <div>Loading...</div>;

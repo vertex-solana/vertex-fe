@@ -3,14 +3,13 @@
 import { FC, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
-import TablesAndTriggersView from "./TablesAndTriggersView";
-import ViewData from "./ViewData";
+import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
+import ViewData from "@/components/sn-indexer/ViewData";
+import { usePathname } from "next/navigation";
 
-interface IndexerItemProps {
-  indexerId: number;
-}
+const IndexerItem = () => {
+  const indexerId = Number(usePathname().split("/").pop());
 
-const IndexerItem: FC<IndexerItemProps> = ({ indexerId }) => {
   const [activeTab, setActiveTab] = useState("tables");
 
   return (

@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 import { Modal } from "@/components/ui/Modal";
 import {
@@ -27,11 +28,13 @@ import { Button } from "@/components/ui/button";
 import { IdlDapp, RpcResponse } from "@/models/app.model";
 import { axiosInstance } from "@/services/config";
 import { CREATE_INDEXER } from "@/const/api.const";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
   description: z.string().min(1, "Description is required."),
-  idlId: z.string().min(1, "IDL is required."),
+  programId: z.string().min(1, "Program ID is required."),
+  idlId: z.string().optional(),
   rpcId: z.string().min(1, "RPC is required."),
 });
 
@@ -57,6 +60,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
       rpcId: "",
       name: "",
       description: "",
+      programId: "",
     },
   });
 
@@ -64,11 +68,14 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
     setIsLoading(true);
 
     try {
+      const idlId = values.idlId ? Number(values.idlId) : null;
+
       const payload = {
         name: values.name.trim(),
-        idlId: Number(values.idlId),
+        idlId,
         rpcId: Number(values.rpcId),
         description: values.description.trim(),
+        programId: values.programId.trim(),
       };
 
       await axiosInstance.post(CREATE_INDEXER, payload);
@@ -86,14 +93,17 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
   return (
     <Modal
       title="Create Indexer"
-      description="Add a new store to manage indexers and IDL."
+      description="Create a new Indexer space for the Program."
       isOpen={isOpen}
       onClose={onClose}
     >
       <div>
         <div className="space-y-4 py-2 pb-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -118,9 +128,26 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                   <FormItem>
                     <FormLabel>Description:</FormLabel>
                     <FormControl>
-                      <Input
+                      <Textarea
                         disabled={isLoading}
                         placeholder="Kamino Indexer"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="programId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Program ID:</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD"
                         {...field}
                       />
                     </FormControl>
@@ -156,6 +183,10 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                         </SelectContent>
                       </Select>
                     </FormControl>
+                    <p className="text-xs italic text-warning2/30 mt-1">
+                      * If you don't choose IDL, in your transform code must add
+                      the schema to parser PDA data onchain
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}

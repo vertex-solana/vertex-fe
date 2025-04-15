@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/services/config";
-import IndexerItem from "@/components/sn-indexer/IndexerItem";
 import { GET_IDLS, GET_INDEXERS, GET_RPC } from "@/const/api.const";
 import { IdlDapp, IndexerResponse, RpcResponse } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
@@ -11,14 +10,13 @@ import { ArrowDirectionIcon } from "@/components/icons";
 import { CommonInput } from "@/components/common";
 import { SearchIcon } from "lucide-react";
 import { twJoin } from "tailwind-merge";
+import { useRouter } from "next/navigation";
 
 const Indexer = () => {
+  const router = useRouter();
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDapp[]>([]);
   const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
-  const [selectedIndexerId, setSelectedIndexerId] = useState<number | null>(
-    null
-  );
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
   const [updatedIndexers, setUpdatedIndexers] = useState<IndexerResponse[]>([]);
 
@@ -71,10 +69,6 @@ const Indexer = () => {
     fetchIdls();
   }, []);
 
-  if (selectedIndexerId) {
-    return <IndexerItem indexerId={selectedIndexerId} />;
-  }
-
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10">
       <div className="flex flex-col items-center gap-y-5 sm:gap-y-8 overflow-y-auto pt-[76px]">
@@ -124,7 +118,11 @@ const Indexer = () => {
                     className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
                   >
                     <p>{indexer.name}</p>
-                    <button onClick={() => setSelectedIndexerId(indexer.id)}>
+                    <button
+                      onClick={() => {
+                        router.push(`/indexers/${indexer.id}`);
+                      }}
+                    >
                       <p className="text-primary5 text-start truncate">
                         {indexer.description}
                       </p>

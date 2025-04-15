@@ -30,14 +30,12 @@ import { CREATE_TABLE } from "@/const/api.const";
 const TypeColumn = [
   "varbinary",
   "varchar",
-  "uint256",
-  "int256",
+  "bigint",
   "integer",
   "double",
   "boolean",
   "timestamp",
   "date",
-  "bigint",
 ] as const;
 
 const schemaFieldSchema = z.object({

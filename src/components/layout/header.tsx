@@ -185,7 +185,7 @@ export default function Header() {
           <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn ? (
               <>
-                {pathName !== "/indexers" && (
+                {pathName === "/" && (
                   <Button
                     size="lg"
                     className="group"
