@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/services/config";
 import IndexerItem from "@/components/sn-indexer/IndexerItem";
-import { GET_IDLS, GET_INDEXERS } from "@/const/api.const";
-import { IdlDapp, IndexerResponse } from "@/models/app.model";
+import { GET_IDLS, GET_INDEXERS, GET_RPC } from "@/const/api.const";
+import { IdlDapp, IndexerResponse, RpcResponse } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
@@ -15,6 +15,7 @@ import { twJoin } from "tailwind-merge";
 const Indexer = () => {
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDapp[]>([]);
+  const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
   const [selectedIndexerId, setSelectedIndexerId] = useState<number | null>(
     null
   );
@@ -42,6 +43,17 @@ const Indexer = () => {
       }
     };
 
+    const fetchRpcs = async () => {
+      try {
+        const response = await axiosInstance.get(GET_RPC);
+        const data = response?.data?.data;
+        setRpcs(data || []);
+      } catch (error) {
+        console.error("Error fetching RPCs:", error);
+      }
+    };
+
+    fetchRpcs();
     fetchIndexers();
   }, [isOpenCreateModal]);
 
@@ -100,22 +112,26 @@ const Indexer = () => {
           </div>
           {updatedIndexers.length > 0 ? (
             <div className="w-full ">
-              <div className="flex items-center w-full grid grid-cols-[35%_65%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
+              <div className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
                 <p>Name</p>
-                <p>Program ID</p>
+                <p>Description</p>
+                <p>Cluster</p>
               </div>
               <div className="flex flex-col sm:h-[330px] overflow-y-auto">
                 {updatedIndexers?.map((indexer) => (
                   <div
                     key={indexer.id}
-                    className="flex items-center w-full grid grid-cols-[35%_65%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
+                    className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
                   >
                     <p>{indexer.name}</p>
                     <button onClick={() => setSelectedIndexerId(indexer.id)}>
                       <p className="text-primary5 text-start truncate">
-                        {indexer.programId}
+                        {indexer.description}
                       </p>
                     </button>
+                    <p className="text-primary5 text-start truncate">
+                      {indexer.cluster}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -135,6 +151,7 @@ const Indexer = () => {
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
+          rpcs={rpcs}
         />
       )}
     </div>

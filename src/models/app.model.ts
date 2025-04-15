@@ -2,9 +2,11 @@ import { Idl } from "@coral-xyz/anchor";
 import { Idl as IdlV30 } from "anchor-v30";
 
 export interface UserInfoInterface {
-  userName?: string;
-  address?: string;
-  email?: string;
+  email: string;
+  userName: string;
+  walletAddress: string;
+  isUpdatedUserName: boolean;
+  createdAt: Date;
 }
 
 export enum SolanaWalletsEnum {
@@ -16,8 +18,10 @@ export enum SolanaWalletsEnum {
 export interface IndexerResponse {
   id: number;
   name: string;
+  description: string;
   programId: string;
   slug: string;
+  cluster: string;
 }
 
 export enum TriggerType {
@@ -64,4 +68,10 @@ export interface IdlDapp {
   version: string;
   idlJson: Idl | IdlV30;
   programId: string;
+}
+
+export interface RpcResponse {
+  id: number;
+  url: string;
+  cluster: string;
 }

@@ -2,8 +2,8 @@ import { UserInfoInterface } from ".";
 import { Dispatch, SetStateAction } from "react";
 
 interface AppContextProps {
-  userInfo: UserInfoInterface;
-  setUserInfo: Dispatch<SetStateAction<UserInfoInterface>>;
+  userInfo: UserInfoInterface | null;
+  setUserInfo: Dispatch<SetStateAction<UserInfoInterface | null>>;
 
   isOpenSignInDialog: boolean;
   setIsOpenSignInDialog: Dispatch<SetStateAction<boolean>>;

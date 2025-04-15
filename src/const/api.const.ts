@@ -16,8 +16,12 @@ export const STT_INTERNAL_SERVER = 500;
 export const STT_NOT_MODIFIED = 304;
 
 // API Path
+export const GET_ACCOUNT = (accountId: number) => `/accounts/${accountId}`;
 export const GET_INDEXERS = "/indexers";
 export const GET_IDLS = "/idl-dapp";
+export const GET_RPC = "/rpc";
+
+export const UPDATE_USERNAME = "accounts/update-user-name";
 
 export const EXECUTE_QUERY = "/indexers/query";
 

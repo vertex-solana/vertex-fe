@@ -1,22 +1,20 @@
 import { ApiConstant } from "@/const";
 import { useAppContext } from "@/context";
+import { axiosInstance } from "@/services/config";
 
 const useAppService = () => {
   const { setUserInfo } = useAppContext();
 
-  const handleGetUserInfo = async () => {
+  const handleGetUserInfo = async (accountId: number) => {
     try {
-      const response = { status: ApiConstant.STT_OK, data: {} } as any; // Replace with actual API call
+      const response = await axiosInstance.get(
+        ApiConstant.GET_ACCOUNT(accountId)
+      );
 
       if (response.status === ApiConstant.STT_OK) {
-        // setUserInfo(response.data);
-        setUserInfo({
-          address: "Da Nang",
-          email: "vertext@gmail.com",
-          userName: "Vertext",
-        });
+        setUserInfo(response.data.data);
       } else {
-        setUserInfo({});
+        setUserInfo(null);
       }
     } catch (error) {
       console.log(error);
