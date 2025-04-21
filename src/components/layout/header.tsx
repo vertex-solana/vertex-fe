@@ -12,6 +12,8 @@ import { Menu } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { jwtDecode } from "jwt-decode";
 import { useAppService } from "@/hooks";
+import Image from "next/image";
+import { ImageAssets } from "public";
 
 type NavItem = {
   label: string;
@@ -84,25 +86,12 @@ export default function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <div className="flex items-center">
-            <div className="text-primary mr-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-                <line x1="12" y1="22" x2="12" y2="15.5"></line>
-                <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-                <line x1="2" y1="15.5" x2="12" y2="8.5"></line>
-                <line x1="12" y1="8.5" x2="22" y2="15.5"></line>
-              </svg>
-            </div>
+          <div className="flex items-center gap-x-1.5">
+            <Image
+              src={ImageAssets.LogoImage}
+              alt="logo image"
+              className="w-6 h-6"
+            />
             <div
               className="font-bold text-xl tracking-tight cursor-pointer"
               onClick={() => router.push("/")}

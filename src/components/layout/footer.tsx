@@ -1,4 +1,6 @@
 import { Twitter, Github, MessageCircleCode } from "lucide-react";
+import Image from "next/image";
+import { ImageAssets } from "public";
 
 export default function Footer() {
   return (
@@ -6,23 +8,12 @@ export default function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-start justify-between">
           <div className="flex flex-col gap-y-3">
-            <div className="text-primary mr-2 flex items-center gap-x-3">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-                <line x1="12" y1="22" x2="12" y2="15.5"></line>
-                <polyline points="22 8.5 12 15.5 2 8.5"></polyline>
-                <line x1="2" y1="15.5" x2="12" y2="8.5"></line>
-                <line x1="12" y1="8.5" x2="22" y2="15.5"></line>
-              </svg>
+            <div className=" mr-2 flex items-center gap-x-3">
+              <Image
+                src={ImageAssets.LogoImage}
+                alt="logo image"
+                className="w-6 h-6"
+              />
               <span className="font-bold text-xl">Sol Index Protocol</span>
             </div>
 
