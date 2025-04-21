@@ -17,6 +17,7 @@ import { axiosInstance } from "@/services/config";
 import { UPDATE_USERNAME } from "@/const/api.const";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 
 interface UpdateUserNameProps {
   isOpen: boolean;
@@ -91,6 +92,8 @@ const MainLayout: FC<ComponentPropsWithoutRef<"div">> = ({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(139,92,246,0.3)_0%,transparent_30%),radial-gradient(circle_at_90%_80%,rgba(59,130,246,0.3)_0%,transparent_30%)] -z-[1]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(rgba(148,163,184,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30 -z-[1]"></div>
       <Header />
+
+      <Toaster />
 
       <div
         className={twJoin(

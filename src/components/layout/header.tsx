@@ -8,7 +8,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { jwtDecode } from "jwt-decode";
 import { useAppService } from "@/hooks";
@@ -19,26 +19,12 @@ type NavItem = {
   isExternal?: boolean;
 };
 
-const navigationItems: NavItem[] = [
-  { label: "Features", href: "#features" },
-  { label: "How it Works", href: "#how-it-works" },
-  { label: "Use Cases", href: "#use-cases" },
-  { label: "Pricing", href: "#pricing" },
-  {
-    label: "Docs",
-    href: "https://docs.solindexprotocol.dev",
-    isExternal: true,
-  },
-];
-
 const navigationIndexer: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Indexer", href: "/indexers" },
   { label: "IDL", href: "/idls" },
 ];
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { handleGetUserInfo } = useAppService();
   const router = useRouter();
@@ -80,16 +66,6 @@ export default function Header() {
       fetchUserInfo(token);
     }
   }, [isLoggedIn]);
-
-  // Effect to detect scroll and update header background
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const handleSignIn = () => {
     window.location.href = `${process.env.SERVICE_URL}/auth/google/login`;
@@ -135,73 +111,30 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          {pathName === "/" ? (
+          <div>
             <nav className="hidden md:flex space-x-8 text-sm font-medium">
-              {navigationItems.map((item) =>
-                item.isExternal ? (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted-foreground hover:text-foreground transition"
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="text-muted-foreground hover:text-foreground transition"
-                  >
-                    {item.label}
-                  </a>
-                )
-              )}
+              {navigationIndexer.map((item) => (
+                <div
+                  key={item.label}
+                  onClick={() => router.push(item.href)}
+                  className={twJoin(
+                    " hover:text-foreground transition hover:cursor-pointer",
+                    item.href === pathName
+                      ? "text-[#642bdf]"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {item.label}
+                </div>
+              ))}
             </nav>
-          ) : (
-            <div>
-              <nav className="hidden md:flex space-x-8 text-sm font-medium">
-                {navigationIndexer.map((item) => (
-                  <div
-                    key={item.label}
-                    onClick={() => router.push(item.href)}
-                    className={twJoin(
-                      " hover:text-foreground transition hover:cursor-pointer",
-                      item.href === pathName
-                        ? "text-[#642bdf]"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    {item.label}
-                  </div>
-                ))}
-              </nav>
-            </div>
-          )}
+          </div>
 
-          {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn ? (
-              <>
-                {pathName === "/" && (
-                  <Button
-                    size="lg"
-                    className="group"
-                    onClick={() => {
-                      router.push("/indexers");
-                    }}
-                  >
-                    Create Indexer
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                )}
-
-                <Button size="lg" className="group" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </>
+              <Button size="lg" className="group" onClick={handleSignOut}>
+                Sign Out
+              </Button>
             ) : (
               <Button size="lg" className="group" onClick={handleSignIn}>
                 Sign In with Google
@@ -219,7 +152,7 @@ export default function Header() {
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <nav className="flex flex-col space-y-4 mt-8">
-                  {navigationItems.map((item) => (
+                  {navigationIndexer.map((item) => (
                     <SheetClose asChild key={item.label}>
                       {item.isExternal ? (
                         <a
