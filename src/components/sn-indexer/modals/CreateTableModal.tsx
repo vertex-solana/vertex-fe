@@ -77,8 +77,8 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
     name: "schema",
   });
 
-  const onErrorSubmit = (errors: any) => {
-    toast.error(`Please fix the errors in the form. ${errors}`);
+  const handleAddField = () => {
+    append({ name: "", type: "varchar", nullable: false });
   };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -95,7 +95,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
         })),
       };
 
-      await axiosInstance.post(CREATE_TABLE(indexerId), payload);
+      // await axiosInstance.post(CREATE_TABLE(indexerId), payload);
 
       toast.success("Table created successfully!");
       onClose();
@@ -115,7 +115,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
     >
       <div className="space-y-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit, onErrorSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-4">
               <FormField
                 control={form.control}
@@ -216,9 +216,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() =>
-                    append({ name: "", type: "varchar", nullable: false })
-                  }
+                  onClick={handleAddField}
                   disabled={isLoading}
                 >
                   Add Field
