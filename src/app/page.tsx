@@ -11,9 +11,11 @@ import { CommonInput } from "@/components/common";
 import { SearchIcon } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
+import { useAppContext } from "@/context";
 
 const Home = () => {
   const router = useRouter();
+  const { userInfo } = useAppContext();
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDapp[]>([]);
   const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
@@ -82,13 +84,16 @@ const Home = () => {
           real-time — fast, flexible, and fully on-chain.
         </p>
 
-        <Button
-          className="w-[150px]"
-          onClick={() => setIsOpenCreateModal(true)}
-        >
-          Create Indexer
-          <ArrowDirectionIcon />
-        </Button>
+        {userInfo && (
+          <Button
+            className="w-[150px]"
+            onClick={() => setIsOpenCreateModal(true)}
+          >
+            Create Indexer
+            <ArrowDirectionIcon />
+          </Button>
+        )}
+
         <div className="rounded-2xl border border-border p-4 bg-[#0a0a0b]/90 w-full sm:max-w-[80%] min-h-[450px] flex items-center flex-col gap-y-1">
           <div className="w-full">
             <CommonInput

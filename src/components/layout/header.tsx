@@ -77,6 +77,7 @@ export default function Header() {
     Cookies.remove("token");
     setIsLoggedIn(false);
     router.push("/");
+    window.location.reload();
   };
 
   return (
