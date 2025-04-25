@@ -95,7 +95,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
         })),
       };
 
-      // await axiosInstance.post(CREATE_TABLE(indexerId), payload);
+      await axiosInstance.post(CREATE_TABLE(indexerId), payload);
 
       toast.success("Table created successfully!");
       onClose();
