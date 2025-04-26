@@ -11,12 +11,20 @@ import {
 } from "@/components/ui/table";
 import { IndexerTableMetadata } from "@/models/app.model";
 import TriggerAndTransformerModal from "./modals/TriggerAndTransformerModal";
+import { useAppContext } from "@/context";
+import { isNil } from "lodash";
 
 interface TableStructureProps {
   tableMetadata: IndexerTableMetadata;
 }
 
 const TableStructure: FC<TableStructureProps> = ({ tableMetadata }) => {
+  const { userInfo, indexer } = useAppContext();
+  const isOwnerIndexer =
+    !isNil(userInfo) &&
+    !isNil(indexer) &&
+    userInfo.id === indexer.ownerAccountId;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -53,13 +61,15 @@ const TableStructure: FC<TableStructureProps> = ({ tableMetadata }) => {
           +{tableMetadata.schema.length - 3} more columns
         </p>
       )}
-      <button
-        className="mt-4 text-sm text-blue-500 hover:underline"
-        onClick={() => setIsModalOpen(true)}
-      >
-        View Triggers & Transformers
-      </button>
-      {isModalOpen && (
+      {isOwnerIndexer && (
+        <button
+          className="mt-4 text-sm text-blue-500 hover:underline"
+          onClick={() => setIsModalOpen(true)}
+        >
+          View Triggers & Transformers
+        </button>
+      )}
+      {isOwnerIndexer && isModalOpen && (
         <TriggerAndTransformerModal
           tableId={tableMetadata.id}
           indexerId={tableMetadata.indexerId}

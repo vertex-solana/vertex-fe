@@ -30,23 +30,25 @@ const EditorPanel = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <h2 className="text-2xl font-bold mb-4">SQL Editor</h2>
-      <Editor
-        height="50%"
-        defaultLanguage="sql"
-        value={query}
-        onChange={(value) => setQuery(value || "")}
-        theme="vs-dark"
-      />
-      <Button
-        onClick={executeQuery}
-        className="mt-4 self-start"
-        disabled={isLoading}
-      >
-        {isLoading ? "Executing..." : "Run Query"}
-      </Button>
-      <div className="mt-4 flex-1 overflow-auto border-t border-gray-700">
+    <div className="grid grid-cols-[40%_60%] h-full">
+      <div className="flex flex-col pr-3">
+        <h2 className="text-2xl font-bold mb-4">SQL Editor</h2>
+        <Editor
+          height="50%"
+          defaultLanguage="sql"
+          value={query}
+          onChange={(value) => setQuery(value || "")}
+          theme="vs-dark"
+        />
+        <Button
+          onClick={executeQuery}
+          className="mt-4 self-start"
+          disabled={isLoading}
+        >
+          {isLoading ? "Executing..." : "Run Query"}
+        </Button>
+      </div>
+      <div className="mt-4 flex-1 overflow-auto border-l border-gray-700 pl-3">
         {isNil(result) ? (
           <div>No results found.</div>
         ) : (

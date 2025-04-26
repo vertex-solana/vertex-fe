@@ -11,6 +11,7 @@ import React, {
 import { UserInfoInterface } from "@/models";
 
 import { AppContextProps } from "@/models/context.model";
+import { IndexerResponse } from "@/models/app.model";
 
 const INITIAL_STATE = {} as AppContextProps;
 
@@ -24,12 +25,16 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
     useState(false);
 
   const [userInfo, setUserInfo] = useState<UserInfoInterface | null>(null);
+  const [indexer, setIndexer] = useState<IndexerResponse | null>(null);
 
   return (
     <AppContext.Provider
       value={{
         userInfo: userInfo,
         setUserInfo: setUserInfo,
+        indexer: indexer,
+        setIndexer: setIndexer,
+
         isOpenSignInDialog,
         setIsOpenSignInDialog,
         isOpenDrawerAccountSetting,

@@ -18,6 +18,7 @@ export const STT_NOT_MODIFIED = 304;
 // API Path
 export const GET_ACCOUNT = (accountId: number) => `/accounts/${accountId}`;
 export const GET_INDEXERS = "/indexers";
+export const GET_INDEXERS_OWNER = "/indexers/owner";
 export const GET_IDLS = "/idl-dapp";
 export const GET_RPC = "/rpc";
 
@@ -35,5 +36,7 @@ export const CREATE_TABLE = (indexerId: number) =>
   `/indexers/${indexerId}/tables/create`;
 export const CREATE_TRIGGER_TRANSFORMER = (indexerId: number) =>
   `/indexers/${indexerId}/register`;
+export const UPDATE_TRANSFORMER = (indexerId: number) =>
+  `/indexers/${indexerId}/transformers`;
 
 export const UPLOAD_IDL = "/idl-dapp/upload";
