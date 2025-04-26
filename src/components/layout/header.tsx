@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -33,7 +35,7 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const { handleGetUserInfo } = useAppService();
-  const { userInfo } = useAppContext();
+  const { userInfo, setIndexer, setUserInfo } = useAppContext();
   const router = useRouter();
 
   const pathName = usePathname();
@@ -79,10 +81,11 @@ export default function Header() {
   };
 
   const handleSignOut = () => {
+    setUserInfo(null);
+    setIndexer(null);
     Cookies.remove("token");
     setIsLoggedIn(false);
     router.push("/");
-    window.location.reload();
   };
 
   return (
@@ -111,7 +114,10 @@ export default function Header() {
               {navigationIndexer.map((item) => (
                 <div
                   key={item.label}
-                  onClick={() => router.push(item.href)}
+                  onClick={() => {
+                    router.push(item.href);
+                    setIndexer(null);
+                  }}
                   className={twJoin(
                     " hover:text-foreground transition hover:cursor-pointer",
                     item.href === pathName

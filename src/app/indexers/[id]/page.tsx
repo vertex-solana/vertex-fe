@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
@@ -8,7 +8,7 @@ import ViewData from "@/components/sn-indexer/ViewData";
 import { usePathname } from "next/navigation";
 
 const IndexerItem = () => {
-  const indexerId = Number(usePathname().split("/").pop());
+  const indexerId = Number(usePathname().split("/indexers/").pop());
 
   const [activeTab, setActiveTab] = useState("tables");
 

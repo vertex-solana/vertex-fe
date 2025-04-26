@@ -2,6 +2,7 @@ import { Idl } from "@coral-xyz/anchor";
 import { Idl as IdlV30 } from "anchor-v30";
 
 export interface UserInfoInterface {
+  id: number;
   email: string;
   userName: string;
   walletAddress: string;
@@ -22,6 +23,7 @@ export interface IndexerResponse {
   programId: string;
   slug: string;
   cluster: string;
+  ownerAccountId: number;
 }
 
 export enum TriggerType {
