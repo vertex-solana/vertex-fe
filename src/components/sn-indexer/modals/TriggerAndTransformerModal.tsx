@@ -2,37 +2,12 @@
 
 import { FC, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { TriggerAndTransformer } from "@/models/app.model";
+import { TransformerPda, TriggerAndTransformer } from "@/models/app.model";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { axiosInstance } from "@/services/config";
-import { GET_TRIGGER_TRANSFORMER } from "@/const/api.const";
-
-const dummyData = [
-  {
-    triggerType: "WS",
-    pdaPubkey: "D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59",
-    pdaName: "reserve",
-    transformerPdaId: 7,
-    transformerPda: {
-      script:
-        "function execute(pdaParser) {\n  const marketPrice = new utils.kamino.Fraction(pdaParser.liquidity.marketPriceSf);\n\n  return {\n    action: 'INSERT',\n    data: {\n      liquidity_available: new utils.common.BN(pdaParser.liquidity.availableAmount).toString(),\n      reserve_address: '711717171717171717'\n    }\n  }\n}",
-    },
-    indexerTableId: 6,
-    indexerId: 1,
-  },
-  {
-    triggerType: "WS",
-    pdaPubkey: "D6q6wuQSrifJKZYpR1M8R4YawnLDtDsMmWM1NbBmgJ59",
-    pdaName: "reserve",
-    transformerPdaId: 7,
-    transformerPda: {
-      script:
-        "function execute(pdaParser) {\n  const marketPrice = new utils.kamino.Fraction(pdaParser.liquidity.marketPriceSf);\n\n  return {\n    action: 'INSERT',\n    data: {\n      liquidity_available: new utils.common.BN(pdaParser.liquidity.availableAmount).toString(),\n      reserve_address: '711717171717171717'\n    }\n  }\n}",
-    },
-    indexerTableId: 6,
-    indexerId: 1,
-  },
-];
+import { GET_TRIGGER_TRANSFORMER, UPDATE_TRANSFORMER } from "@/const/api.const";
+import { twJoin } from "tailwind-merge";
+import toast from "react-hot-toast";
 
 interface TriggerAndTransformerModalProps {
   indexerId: number;
@@ -48,8 +23,30 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
   const [triggersAndTransformers, setTriggersAndTransformers] = useState<
     TriggerAndTransformer[]
   >([]);
-  const [selectedScript, setSelectedScript] = useState<string | null>(null);
+  const [selectedTransformer, setSelectedTransformer] =
+    useState<TransformerPda | null>(null);
+  const [isUpdateScript, setIsUpdateScript] = useState(false);
+  const [script, setScript] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdatingScript, setIsUpdatingScript] = useState(false);
+
+  const handleUpdateScript = async () => {
+    if (!script) return;
+
+    setIsUpdatingScript(true);
+    try {
+      await axiosInstance.patch(UPDATE_TRANSFORMER(indexerId), {
+        script,
+        transformerId: selectedTransformer?.id,
+      });
+      toast.success("Script updated successfully");
+    } catch (error) {
+      setIsUpdatingScript(false);
+      setSelectedTransformer(null);
+      setIsUpdateScript(false);
+      toast.error("Failed to update script");
+    }
+  };
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -63,16 +60,13 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
         setTriggersAndTransformers(data || []);
       } catch (error) {
         console.error("Error fetching triggers and transformers:", error);
-
-        // Dummy data for development
-        setTriggersAndTransformers(dummyData);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchDetails();
-  }, [tableId]);
+  }, [tableId, isUpdatingScript]);
 
   if (isLoading) {
     return <div className="text-white text-center">Loading...</div>;
@@ -81,9 +75,7 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center">
       <div
-        className={`bg-gray-900 text-white rounded-lg w-[800px] ${
-          selectedScript ? "h-[600px]" : "h-auto"
-        } relative overflow-hidden shadow-lg`}
+        className={`bg-gray-900 text-white rounded-lg w-[800px] relative overflow-hidden shadow-lg`}
       >
         <div className="sticky top-0 bg-gray-900 z-10 p-6 border-b border-gray-700">
           <h2 className="text-2xl font-bold">Triggers & Transformers</h2>
@@ -135,8 +127,8 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
                   <button
                     className="text-blue-400 hover:underline text-sm"
                     onClick={() =>
-                      setSelectedScript(
-                        triggerAndTransformer.transformerPda.script
+                      setSelectedTransformer(
+                        triggerAndTransformer.transformerPda
                       )
                     }
                   >
@@ -146,26 +138,75 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
               ))}
             </ul>
           </div>
-          {selectedScript && (
+          {selectedTransformer && (
             <div className="mt-6">
-              <h4 className="text-lg font-semibold mb-2">Transformer Script</h4>
+              <div className="flex justify-between mb-4 text-right">
+                <h4 className="text-lg font-semibold mb-2">
+                  Transformer Script
+                </h4>
+                {!isUpdateScript ? (
+                  <button
+                    className="p-2 min-w-[74px] text-sm rounded-lg bg-[#6d2ef4]"
+                    onClick={() => {
+                      setIsUpdateScript(true);
+                      setScript(selectedTransformer.script);
+                    }}
+                  >
+                    Edit
+                  </button>
+                ) : (
+                  <div className="flex space-x-2">
+                    <button
+                      className="p-2 min-w-[74px] text-sm rounded-lg border border-gray-50"
+                      onClick={() => {
+                        setIsUpdateScript(false);
+                        setScript(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className={twJoin(
+                        "p-2 min-w-[74px] text-sm rounded-lg",
+                        script === selectedTransformer.script
+                          ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                          : "bg-[#6d2ef4] hover:bg-[#824df3]"
+                      )}
+                      onClick={handleUpdateScript}
+                      disabled={
+                        script === selectedTransformer.script ||
+                        isUpdatingScript
+                      }
+                    >
+                      Save
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="border border-gray-700 rounded-md overflow-hidden">
                 <Editor
                   height="300px"
                   defaultLanguage="javascript"
-                  value={selectedScript}
+                  value={selectedTransformer.script}
                   theme="vs-dark"
                   options={{
-                    readOnly: true,
+                    readOnly: !isUpdateScript,
                     minimap: { enabled: false },
                     scrollBeyondLastLine: false,
+                  }}
+                  onChange={(value) => {
+                    value && setScript(value);
                   }}
                 />
               </div>
               <div className="mt-4 text-right">
                 <button
                   className="text-sm text-red-400 hover:underline"
-                  onClick={() => setSelectedScript(null)}
+                  onClick={() => {
+                    setSelectedTransformer(null);
+                    setIsUpdateScript(false);
+                    setScript(null);
+                  }}
                 >
                   Close Script
                 </button>

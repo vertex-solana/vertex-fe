@@ -1,3 +1,5 @@
+'use client";';
+
 import { Twitter, Github, MessageCircleCode } from "lucide-react";
 import Image from "next/image";
 import { ImageAssets } from "public";
@@ -14,12 +16,11 @@ export default function Footer() {
                 alt="logo image"
                 className="w-6 h-6"
               />
-              <span className="font-bold text-xl">Sol Index Protocol</span>
+              <span className="font-bold text-xl">Vertex</span>
             </div>
 
             <p className="text-muted-foreground text-sm">
-              &copy; {new Date().getFullYear()} Sol Index Protocol. All rights
-              reserved.
+              &copy; {new Date().getFullYear()} Vertex. All rights reserved.
             </p>
           </div>
           <div className="flex flex-col gap-y-3 items-end">
@@ -28,24 +29,24 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4">
               <a
-                href="#"
+                href="https://x.com/vertex__sol"
                 className="text-muted-foreground hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
                 <Twitter className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href="https://github.com/vertex-solana"
                 className="text-muted-foreground hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
                 <Github className="h-6 w-6" />
               </a>
               <a
-                href="#"
+                href="https://t.me/+eYGNHuF2aTJkYWJl"
                 className="text-muted-foreground hover:text-foreground transition"
               >
-                <span className="sr-only">MessageCircleCode</span>
+                <span className="sr-only">Telegram</span>
                 <MessageCircleCode className="h-6 w-6" />
               </a>
             </div>

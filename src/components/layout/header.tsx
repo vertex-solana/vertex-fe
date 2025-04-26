@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -14,6 +16,9 @@ import { jwtDecode } from "jwt-decode";
 import { useAppService } from "@/hooks";
 import Image from "next/image";
 import { ImageAssets } from "public";
+import { DropdownContent, DropdownRoot, DropdownTrigger } from "../common";
+import { ArrowIcon, LogoutIcon } from "../icons";
+import { useAppContext } from "@/context";
 
 type NavItem = {
   label: string;
@@ -28,7 +33,9 @@ const navigationIndexer: NavItem[] = [
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const { handleGetUserInfo } = useAppService();
+  const { userInfo, setIndexer, setUserInfo } = useAppContext();
   const router = useRouter();
 
   const pathName = usePathname();
@@ -74,10 +81,11 @@ export default function Header() {
   };
 
   const handleSignOut = () => {
+    setUserInfo(null);
+    setIndexer(null);
     Cookies.remove("token");
     setIsLoggedIn(false);
     router.push("/");
-    window.location.reload();
   };
 
   return (
@@ -106,7 +114,10 @@ export default function Header() {
               {navigationIndexer.map((item) => (
                 <div
                   key={item.label}
-                  onClick={() => router.push(item.href)}
+                  onClick={() => {
+                    router.push(item.href);
+                    setIndexer(null);
+                  }}
                   className={twJoin(
                     " hover:text-foreground transition hover:cursor-pointer",
                     item.href === pathName
@@ -122,9 +133,46 @@ export default function Header() {
 
           <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn ? (
-              <Button size="lg" className="group" onClick={handleSignOut}>
-                Sign Out
-              </Button>
+              <DropdownRoot
+                open={isOpenDropdown}
+                onOpenChange={() => setIsOpenDropdown(!isOpenDropdown)}
+              >
+                <DropdownTrigger>
+                  <div className="min-w-[114px] flex items-center justify-between gap-x-2 px-3 py-2.5 rounded-full bg-[#1e2024] text-neutral5">
+                    <Image
+                      src={ImageAssets.DefaultUserImage}
+                      alt="default user image"
+                      className="rounded-full w-7 h-7"
+                    />
+                    <p>{userInfo?.userName}</p>
+                    <ArrowIcon
+                      className={twJoin(
+                        "text-neutral1",
+                        isOpenDropdown && "rotate-180"
+                      )}
+                    />
+                  </div>
+                </DropdownTrigger>
+                <DropdownContent
+                  className={twJoin(
+                    "w-fit text-sm",
+                    "overflow-hidden",
+                    "border border-white/20 bg-[#1e2024]"
+                  )}
+                  align="center"
+                >
+                  <div className="flex flex-col gap-y-3 py-3 px-4 border-b-[0.5px] border-neutral5">
+                    <p>{`Name: ${userInfo?.userName}`}</p>
+                    <p>{`Email: ${userInfo?.email}`}</p>
+                  </div>
+                  <button
+                    className="text-error2 p-3 w-full flex items-center gap-x-2 justify-center"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out <LogoutIcon className="w-5 h-5" />
+                  </button>
+                </DropdownContent>
+              </DropdownRoot>
             ) : (
               <Button size="lg" className="group" onClick={handleSignIn}>
                 Sign In with Google

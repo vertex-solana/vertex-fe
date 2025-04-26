@@ -18,8 +18,12 @@ import { toast } from "react-hot-toast";
 import { CommonInput } from "@/components/common";
 import { SearchIcon } from "@/components/icons";
 import { twJoin } from "tailwind-merge";
+import { useAppContext } from "@/context";
+import { isNil } from "lodash";
 
 const IDL = () => {
+  const { userInfo } = useAppContext();
+
   const idlsRef = useRef<IdlDapp[]>();
   const [idls, setIdls] = useState<IdlDapp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +31,8 @@ const IDL = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
+
     const fetchIdls = async () => {
       try {
         const response = await axiosInstance.get(GET_IDLS);
@@ -40,7 +46,12 @@ const IDL = () => {
         setIsLoading(false);
       }
     };
-    fetchIdls();
+    
+    if (!isNil(userInfo)) {
+      fetchIdls();
+    } else {
+      setIsLoading(false);
+    }
   }, [isUploadModalOpen]);
 
   if (isLoading) {

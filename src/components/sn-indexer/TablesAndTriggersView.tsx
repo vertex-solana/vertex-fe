@@ -5,10 +5,11 @@ import { FC, useEffect, useState } from "react";
 import { CreateTableModal } from "./modals/CreateTableModal";
 import { IndexerTableMetadata } from "@/models/app.model";
 import TableStructure from "./TableStructure";
-import axios from "axios";
 import CreateTriggerModal from "./modals/CreateTriggerModal";
 import { axiosInstance } from "@/services/config";
 import { GET_TABLES_INDEXER } from "@/const/api.const";
+import { useAppContext } from "@/context";
+import { isNil } from "lodash";
 
 interface TablesAndTriggersViewProps {
   indexerId: number;
@@ -17,6 +18,12 @@ interface TablesAndTriggersViewProps {
 const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
   indexerId,
 }) => {
+  const { userInfo, indexer } = useAppContext();
+  const isOwnerIndexer =
+    !isNil(userInfo) &&
+    !isNil(indexer) &&
+    userInfo.id === indexer.ownerAccountId;
+
   const [isOpenModalCreateTable, setIsOpenModalCreateTable] = useState(false);
   const [isOpenModalCreateTrigger, setIsOpenModalCreateTrigger] =
     useState(false);
@@ -48,20 +55,22 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
     <div className="w-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Tables & Triggers</h2>
-        <div className="flex gap-2">
-          <Button onClick={() => setIsOpenModalCreateTable(true)}>
-            Create Table
-          </Button>
-          <Button onClick={() => setIsOpenModalCreateTrigger(true)}>
-            Create Trigger
-          </Button>
-        </div>
+        {isOwnerIndexer && (
+          <div className="flex gap-2">
+            <Button onClick={() => setIsOpenModalCreateTable(true)}>
+              Create Table
+            </Button>
+            <Button onClick={() => setIsOpenModalCreateTrigger(true)}>
+              Create Trigger
+            </Button>
+          </div>
+        )}
       </div>
       <p className="text-gray-400">
         This is the view for managing tables and triggers for the indexer.
       </p>
 
-      {isOpenModalCreateTable && (
+      {isOwnerIndexer && isOpenModalCreateTable && (
         <CreateTableModal
           indexerId={indexerId}
           isOpen={isOpenModalCreateTable}
@@ -69,7 +78,7 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
         />
       )}
 
-      {isOpenModalCreateTrigger && (
+      {isOwnerIndexer && isOpenModalCreateTrigger && (
         <CreateTriggerModal
           indexerId={indexerId}
           tables={tables}
