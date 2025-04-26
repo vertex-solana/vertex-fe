@@ -41,10 +41,11 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
       });
       toast.success("Script updated successfully");
     } catch (error) {
+      toast.error("Failed to update script");
+    } finally {
       setIsUpdatingScript(false);
       setSelectedTransformer(null);
       setIsUpdateScript(false);
-      toast.error("Failed to update script");
     }
   };
 
