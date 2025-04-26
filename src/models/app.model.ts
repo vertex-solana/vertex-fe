@@ -79,3 +79,8 @@ export interface RpcResponse {
   url: string;
   cluster: string;
 }
+
+export enum IndexerTypeEnum {
+  All = "All",
+  Owner = "Owner",
+}

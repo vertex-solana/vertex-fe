@@ -8,7 +8,12 @@ import {
   GET_INDEXERS_OWNER,
   GET_RPC,
 } from "@/const/api.const";
-import { IdlDapp, IndexerResponse, RpcResponse } from "@/models/app.model";
+import {
+  IdlDapp,
+  IndexerResponse,
+  IndexerTypeEnum,
+  RpcResponse,
+} from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
@@ -227,8 +232,3 @@ const Home = () => {
 };
 
 export default Home;
-
-export enum IndexerTypeEnum {
-  All = "All",
-  Owner = "Owner",
-}
