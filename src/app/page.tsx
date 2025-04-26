@@ -120,7 +120,7 @@ const Home = () => {
   }, [selectedTypeIndexer, allIndexers, ownerIndexers]);
 
   return (
-    <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10">
+    <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
       <div className="flex flex-col items-center gap-y-5 sm:gap-y-8 overflow-y-auto pt-[76px]">
         <p className="text-4xl md:text-5xl lg:text-6xl font-bold  leading-tight">
           Indexer Space

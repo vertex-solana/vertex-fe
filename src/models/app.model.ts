@@ -51,7 +51,9 @@ export interface ExecuteQueryResponse {
 }
 
 export interface TransformerPda {
+  id: number;
   script: string;
+  indexerId: number;
 }
 
 export interface TriggerAndTransformer {
