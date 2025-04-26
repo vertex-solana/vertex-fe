@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
-import ViewData from "@/components/sn-indexer/ViewData";
 import { usePathname } from "next/navigation";
+import EditorPanel from "@/components/sn-indexer/EditorPanel";
 
 const IndexerItem = () => {
   const indexerId = Number(usePathname().split("/indexers/").pop());
@@ -37,7 +37,7 @@ const IndexerItem = () => {
             <TablesAndTriggersView indexerId={indexerId} />
           </TabsContent>
           <TabsContent value="view" className="h-full">
-            <ViewData indexerId={indexerId} />
+            <EditorPanel />
           </TabsContent>
         </div>
       </Tabs>
