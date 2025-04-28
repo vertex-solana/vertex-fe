@@ -26,6 +26,7 @@ export const UPDATE_USERNAME = "accounts/update-user-name";
 
 export const EXECUTE_QUERY = "/indexers/query";
 
+export const GET_INDEXER = (indexerId: number) => `/indexers/${indexerId}`;
 export const CREATE_INDEXER = "/indexers/create";
 export const GET_TABLES_INDEXER = (indexerId: number) =>
   `/indexers/${indexerId}/tables`;

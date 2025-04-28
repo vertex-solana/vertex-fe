@@ -1,16 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
 import { usePathname } from "next/navigation";
 import EditorPanel from "@/components/sn-indexer/EditorPanel";
+import { axiosInstance } from "@/services/config";
+import { GET_INDEXER } from "@/const/api.const";
+import { useAppContext } from "@/context";
 
 const IndexerItem = () => {
   const indexerId = Number(usePathname().split("/indexers/").pop());
+  const [isLoading, setIsLoading] = useState(false);
+
+  const { setIndexer } = useAppContext();
+
+  useEffect(() => {
+    const getIndexer = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axiosInstance.get(GET_INDEXER(indexerId));
+
+        setIndexer(response?.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching indexer:", error);
+        setIsLoading(false);
+      }
+    };
+
+    getIndexer();
+  }, []);
 
   const [activeTab, setActiveTab] = useState("tables");
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex h-screen w-full border-t border-gray-800">
