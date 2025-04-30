@@ -59,7 +59,7 @@ const IndexerItem = () => {
           </TabsList>
         </div>
 
-        <div className="flex-1 p-6 overflow-auto h-full">
+        <div className="flex-1 p-6 h-full w-full overflow-auto">
           <TabsContent value="tables" className="h-full">
             <TablesAndTriggersView indexerId={indexerId} />
           </TabsContent>

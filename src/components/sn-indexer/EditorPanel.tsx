@@ -1,27 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
-import { ExecuteQueryResponse } from "@/models/app.model";
+import { ExecuteQueryResponse, QueryLogResponse } from "@/models/app.model";
 import { isNil } from "lodash";
 import DataViewManager from "./DataViewmanager";
 import { axiosInstance } from "@/services/config";
-import { EXECUTE_QUERY } from "@/const/api.const";
+import { EXECUTE_QUERY, GET_QUERY_LOG } from "@/const/api.const";
+import { useAppContext } from "@/context";
 
 const EditorPanel = () => {
+  const { indexer } = useAppContext();
+
   const [query, setQuery] = useState<string>(
     "SELECT * FROM table_name LIMIT 10"
   );
+  const [queryLog, setQueryLog] = useState<QueryLogResponse[]>([]);
   const [result, setResult] = useState<ExecuteQueryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreateQueryLogModalOpen, setIsCreateQueryLogModalOpen] =
+    useState(false);
+
+  useEffect(() => {
+    const getAllQuery = async () => {
+      const response = await axiosInstance.get(GET_QUERY_LOG(indexer!.id));
+
+      setQueryLog(response?.data.data || []);
+    };
+
+    getAllQuery();
+  }, [isCreateQueryLogModalOpen]);
 
   const executeQuery = async () => {
     setIsLoading(true);
     try {
       const response = await axiosInstance.post(EXECUTE_QUERY, { query });
 
-      setResult(response?.data?.data || null);
+      setResult(response?.data?.data || []);
     } catch (error) {
       console.error("Error executing query:", error);
     } finally {
@@ -29,31 +45,55 @@ const EditorPanel = () => {
     }
   };
 
+  const handleQuerySelection = (selectedQuery: string) => {
+    setQuery(selectedQuery);
+  };
+
   return (
-    <div className="grid grid-cols-[40%_60%] h-full">
+    <div className="flex flex-col h-full w-full">
       <div className="flex flex-col pr-3">
         <h2 className="text-2xl font-bold mb-4">SQL Editor</h2>
-        <Editor
-          height="50%"
-          defaultLanguage="sql"
-          value={query}
-          onChange={(value) => setQuery(value || "")}
-          theme="vs-dark"
-        />
-        <Button
-          onClick={executeQuery}
-          className="mt-4 self-start"
-          disabled={isLoading}
-        >
-          {isLoading ? "Executing..." : "Run Query"}
-        </Button>
-      </div>
-      <div className="mt-4 flex-1 overflow-auto border-l border-gray-700 pl-3">
-        {isNil(result) ? (
-          <div>No results found.</div>
-        ) : (
-          <DataViewManager responseQuery={result} />
-        )}
+        <div className="grid grid-cols-[70%_30%] gap-2">
+          <Editor
+            height="300px"
+            defaultLanguage="sql"
+            value={query}
+            onChange={(value) => setQuery(value || "")}
+            theme="vs-dark"
+          />
+          <div className="flex flex-col gap-3 items-end justify-start">
+            <select
+              id="query-log"
+              className="p-2 border border-gray-300 rounded-md bg-gray-700 text-white"
+              onChange={(e) => handleQuerySelection(e.target.value)}
+              disabled={queryLog.length === 0}
+            >
+              <option value="">
+                {queryLog.length > 0 ? "Select Query" : "No queries available"}
+              </option>
+              {queryLog.map((log) => (
+                <option key={log.id} value={log.query}>
+                  {log.description || log.query}
+                </option>
+              ))}
+            </select>
+            <Button onClick={executeQuery} disabled={isLoading}>
+              {isLoading ? "Executing..." : "Run Query"}
+            </Button>
+          </div>
+        </div>
+        <div className="mt-4 flex-1 overflow-auto border-t border-gray-700 pl-3">
+          {isNil(result) ? (
+            <div></div>
+          ) : (
+            <DataViewManager
+              responseQuery={result}
+              currentQuery={query}
+              isCreateQueryLogModalOpen={isCreateQueryLogModalOpen}
+              setIsCreateQueryLogModalOpen={setIsCreateQueryLogModalOpen}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

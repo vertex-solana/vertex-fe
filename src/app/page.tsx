@@ -156,16 +156,17 @@ const Home = () => {
           <div className="w-full rounded-b-xl border border-border p-4 bg-[#0a0a0b]/90  min-h-[450px] flex items-center flex-col gap-y-1">
             {indexers.length > 0 ? (
               <div className="w-full ">
-                <div className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
+                <div className="flex items-center w-full grid grid-cols-[20%_50%_10%_20%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
                   <p>Name</p>
                   <p>Description</p>
                   <p>Cluster</p>
+                  <p>Author</p>
                 </div>
                 <div className="flex flex-col sm:h-[330px] overflow-y-auto">
                   {indexers?.map((indexer) => (
                     <div
                       key={indexer.id}
-                      className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
+                      className="flex items-center w-full grid grid-cols-[20%_50%_10%_20%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
                     >
                       <p>{indexer.name}</p>
                       <button
@@ -180,6 +181,10 @@ const Home = () => {
                       </button>
                       <p className="text-primary5 text-start truncate">
                         {indexer.cluster}
+                      </p>
+
+                      <p className="text-primary5 text-start truncate">
+                        {indexer.owner.userName}
                       </p>
                     </div>
                   ))}
