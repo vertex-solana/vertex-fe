@@ -2,18 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/services/config";
-import {
-  GET_IDLS,
-  GET_INDEXERS,
-  GET_INDEXERS_OWNER,
-  GET_RPC,
-} from "@/const/api.const";
-import {
-  IdlDapp,
-  IndexerResponse,
-  IndexerTypeEnum,
-  RpcResponse,
-} from "@/models/app.model";
+import { GET_IDLS, GET_INDEXERS, GET_INDEXERS_OWNER } from "@/const/api.const";
+import { IdlDapp, IndexerResponse, IndexerTypeEnum } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
@@ -30,7 +20,6 @@ const Home = () => {
   const [allIndexers, setAllIndexers] = useState<IndexerResponse[]>([]);
   const [ownerIndexers, setOwnerIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDapp[]>([]);
-  const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
 
@@ -66,18 +55,6 @@ const Home = () => {
       }
     };
     fetchIdls();
-
-    const fetchRpcs = async () => {
-      try {
-        const response = await axiosInstance.get(GET_RPC);
-        const data = response?.data?.data;
-        setRpcs(data || []);
-      } catch (error) {
-        console.error("Error fetching RPCs:", error);
-      }
-    };
-
-    fetchRpcs();
   }, [isOpenCreateModal]);
 
   useEffect(() => {
@@ -113,7 +90,7 @@ const Home = () => {
 
     fetchAllIndexers();
     fetchIndexersOwner();
-  }, [userInfo]);
+  }, [userInfo, isOpenCreateModal]);
 
   useEffect(() => {
     const filterIndexers =
@@ -224,7 +201,6 @@ const Home = () => {
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
-          rpcs={rpcs}
         />
       )}
     </div>

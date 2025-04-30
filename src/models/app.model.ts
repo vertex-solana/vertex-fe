@@ -74,12 +74,6 @@ export interface IdlDapp {
   programId: string;
 }
 
-export interface RpcResponse {
-  id: number;
-  url: string;
-  cluster: string;
-}
-
 export enum IndexerTypeEnum {
   All = "All",
   Owner = "Owner",

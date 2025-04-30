@@ -20,7 +20,6 @@ export const GET_ACCOUNT = (accountId: number) => `/accounts/${accountId}`;
 export const GET_INDEXERS = "/indexers";
 export const GET_INDEXERS_OWNER = "/indexers/owner";
 export const GET_IDLS = "/idl-dapp";
-export const GET_RPC = "/rpc";
 
 export const UPDATE_USERNAME = "accounts/update-user-name";
 
