@@ -56,7 +56,7 @@ const useAppHooks = () => {
     }
 
     if (isNil(params.pageSize)) {
-      params.pageSize = 10;
+      params.pageSize = 100;
     }
 
     return await getAllIndexers(params);
@@ -71,7 +71,7 @@ const useAppHooks = () => {
     }
 
     if (isNil(params.pageSize)) {
-      params.pageSize = 10;
+      params.pageSize = 100;
     }
 
     return await getIndexerOwner(params);
@@ -86,7 +86,7 @@ const useAppHooks = () => {
     }
 
     if (isNil(params.pageSize)) {
-      params.pageSize = 10;
+      params.pageSize = 100;
     }
 
     return await getIdls(params);
