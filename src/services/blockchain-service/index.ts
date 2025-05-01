@@ -1,7 +1,6 @@
 import { web3 } from "@project-serum/anchor";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { PriorityLevel } from "./sol-blockchain-service/type";
-import { TransactionWithSigners } from "@/models/common.model";
 import { SolBlockchainService } from "./sol-blockchain-service";
 
 export interface BlockchainServiceInterface {
@@ -24,8 +23,6 @@ export interface ReqSendTransactionInterface {
   transactionData:
     | web3.Transaction
     | web3.Transaction[]
-    | TransactionWithSigners
-    | TransactionWithSigners[];
   rpcEndpoint?: string;
   walletAddress?: string;
   getLabel?: any;
