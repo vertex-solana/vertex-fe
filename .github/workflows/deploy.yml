@@ -46,13 +46,15 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            cd ~/deploy
+            sudo mkdir -p /home/ubuntu/apps/frontend
 
-            tar -xzf frontend.tar.gz -C ~/apps/frontend
+            sudo tar -xzf /home/ubuntu/deploy/frontend.tar.gz -C /home/ubuntu/apps/frontend
+            sudo rm -rf /home/ubuntu/deploy/frontend.tar.gz
 
-            cd ~/apps/frontend
-            npm ci --omit=dev
+            cd /home/ubuntu/apps/frontend
+            
+            npm install --omit=dev
 
-            pm2 flush frontend
-            pm2 delete frontend
+            pm2 flush frontend || true
+            pm2 delete frontend || true
             pm2 start npm --name "frontend" -- start
