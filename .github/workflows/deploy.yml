@@ -22,7 +22,7 @@ jobs:
 
       - name: Build frontend
         run: |
-          echo "${{ secrets.FRONTEND_ENV }}" > .env
+          echo "${{ secrets.ENV }}" > .env
           pnpm install
           pnpm build
           rm -rf node_modules
@@ -38,23 +38,21 @@ jobs:
           source: "frontend.tar.gz"
           target: "/home/ubuntu/deploy"
 
-      # - name: Run remote deploy script on EC2
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USER }}
-      #     key: ${{ secrets.EC2_KEY }}
-      #     port: ${{ secrets.EC2_PORT }}
-      #     script: |
-      #       cd ~/deploy
+      - name: Run remote deploy script on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            cd ~/deploy
 
-      #       tar -xzf frontend.tar.gz -C ~/apps/frontend
-      #       tar -xzf backend.tar.gz -C ~/apps/backend
+            tar -xzf frontend.tar.gz -C ~/apps/frontend
 
-      #       cd ~/apps/frontend
-      #       npm ci --omit=dev
-      #       pm2 restart frontend
+            cd ~/apps/frontend
+            npm ci --omit=dev
 
-      #       cd ~/apps/backend
-      #       npm ci --omit=dev
-      #       pm2 restart backend
+            pm2 flush frontend
+            pm2 delete frontend
+            pm2 start npm --name "frontend" -- start
