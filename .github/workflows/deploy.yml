@@ -51,8 +51,11 @@ jobs:
             sudo tar -xzf /home/ubuntu/deploy/frontend.tar.gz -C /home/ubuntu/apps/frontend
             sudo rm -rf /home/ubuntu/deploy/frontend.tar.gz
 
+            source ~/.nvm/nvm.sh
+            nvm use node
+
             cd /home/ubuntu/apps/frontend
-            
+
             npm install --omit=dev
 
             pm2 flush frontend || true
