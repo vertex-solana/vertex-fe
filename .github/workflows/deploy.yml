@@ -47,6 +47,7 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             sudo mkdir -p /home/ubuntu/apps/frontend
+            sudo chown -R ubuntu:ubuntu /home/ubuntu/apps/frontend
 
             sudo tar -xzf /home/ubuntu/deploy/frontend.tar.gz -C /home/ubuntu/apps/frontend
             sudo rm -rf /home/ubuntu/deploy/frontend.tar.gz
