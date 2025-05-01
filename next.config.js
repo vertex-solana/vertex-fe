@@ -10,6 +10,10 @@ const nextConfig = {
     RPC_URL: process.env.RPC_URL || "",
     SERVICE_URL: process.env.SERVICE_URL || "",
   },
+  eslint: {
+    dirs: ['src'],
+  },
+
   async headers() {
     return [
       {

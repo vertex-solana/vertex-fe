@@ -1,0 +1,7 @@
+echo "Linting....👻"
+pnpm lint-staged
+
+echo "Building....👷🏻"
+pnpm build
+
+exit 0
