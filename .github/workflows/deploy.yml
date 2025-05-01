@@ -17,11 +17,14 @@ jobs:
         with:
           node-version: 23
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Build frontend
         run: |
           echo "${{ secrets.FRONTEND_ENV }}" > .env
-          npm ci
-          npm run build
+          pnpm install
+          pnpm build
           rm -rf node_modules
           tar -czf frontend.tar.gz .next package.json public .env
 
