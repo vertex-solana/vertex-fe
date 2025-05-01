@@ -6,23 +6,27 @@ import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
 import { usePathname } from "next/navigation";
 import EditorPanel from "@/components/sn-indexer/EditorPanel";
-import { axiosInstance } from "@/services/config";
-import { GET_INDEXER } from "@/const/api.const";
 import { useAppContext } from "@/context";
+import { useAppHooks } from "@/hooks";
 
 const IndexerItem = () => {
   const indexerId = Number(usePathname().split("/indexers/").pop());
-  const [isLoading, setIsLoading] = useState(false);
 
   const { setIndexer } = useAppContext();
+  const { handleGetIndexerDetail } = useAppHooks();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getIndexer = async () => {
       try {
         setIsLoading(true);
-        const response = await axiosInstance.get(GET_INDEXER(indexerId));
+        const response = await handleGetIndexerDetail(indexerId);
 
-        setIndexer(response?.data.data);
+        if (response) {
+          setIndexer(response);
+        }
+
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching indexer:", error);
@@ -31,7 +35,7 @@ const IndexerItem = () => {
     };
 
     getIndexer();
-  }, []);
+  }, [indexerId]);
 
   const [activeTab, setActiveTab] = useState("tables");
 

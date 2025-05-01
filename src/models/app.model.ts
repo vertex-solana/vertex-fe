@@ -67,7 +67,7 @@ export interface TriggerAndTransformer {
   indexerId: number;
 }
 
-export interface IdlDapp {
+export interface IdlDappResponse {
   id: number;
   name: string;
   version: string;

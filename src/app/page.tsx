@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { axiosInstance } from "@/services/config";
-import { GET_IDLS, GET_INDEXERS, GET_INDEXERS_OWNER } from "@/const/api.const";
-import { IdlDapp, IndexerResponse, IndexerTypeEnum } from "@/models/app.model";
+import {
+  IdlDappResponse,
+  IndexerResponse,
+  IndexerTypeEnum,
+} from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
@@ -13,13 +15,17 @@ import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context";
 import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
 
 const Home = () => {
   const router = useRouter();
   const { userInfo, setIndexer } = useAppContext();
+  const { handleGetAllIndexers, handleGetIndexersOwner, handleGetIdls } =
+    useAppHooks();
+
   const [allIndexers, setAllIndexers] = useState<IndexerResponse[]>([]);
   const [ownerIndexers, setOwnerIndexers] = useState<IndexerResponse[]>([]);
-  const [idls, setIdls] = useState<IdlDapp[]>([]);
+  const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
 
@@ -44,52 +50,57 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const fetchIdls = async () => {
+    const getIdls = async () => {
       try {
-        const response = await axiosInstance.get(GET_IDLS);
-        const data = response?.data?.data;
-
-        setIdls(data || []);
+        // TODO: Handle Pagination
+        const response = await handleGetIdls({});
+        if (response) {
+          setIdls(response.pageData || []);
+        }
       } catch (error) {
         console.error("Error fetching Idl:", error);
       }
     };
-    fetchIdls();
+    getIdls();
   }, [isOpenCreateModal]);
 
   useEffect(() => {
-    const fetchIndexersOwner = async () => {
+    const getIndexersOwner = async () => {
       try {
         if (isNil(userInfo)) {
           setOwnerIndexers([]);
         } else {
-          const response = await axiosInstance.get(GET_INDEXERS_OWNER);
-          const data = response?.data?.data;
+          // TODO: Handle Pagination
+          const response = await handleGetIndexersOwner({});
 
-          setOwnerIndexers(data || []);
+          if (response) {
+            setOwnerIndexers(response.pageData || []);
+          }
         }
       } catch (error) {
         console.error("Error fetching indexers:", error);
       }
     };
 
-    const fetchAllIndexers = async () => {
+    const getAllIndexers = async () => {
       try {
         if (isNil(userInfo)) {
           setAllIndexers([]);
         } else {
-          const response = await axiosInstance.get(GET_INDEXERS);
-          const data = response?.data?.data;
+          // TODO: Handle Pagination
+          const response = await handleGetAllIndexers({});
 
-          setAllIndexers(data || []);
+          if (response) {
+            setAllIndexers(response.pageData || []);
+          }
         }
       } catch (error) {
         console.error("Error fetching indexers:", error);
       }
     };
 
-    fetchAllIndexers();
-    fetchIndexersOwner();
+    getAllIndexers();
+    getIndexersOwner();
   }, [userInfo, isOpenCreateModal]);
 
   useEffect(() => {

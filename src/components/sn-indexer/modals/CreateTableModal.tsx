@@ -24,8 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { axiosInstance } from "@/services/config";
-import { CREATE_TABLE } from "@/const/api.const";
+import { useAppHooks } from "@/hooks";
 
 const TypeColumn = [
   "varbinary",
@@ -62,6 +61,8 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
   onClose,
   indexerId,
 }) => {
+  const { handleCreateTable } = useAppHooks();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -95,7 +96,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
         })),
       };
 
-      await axiosInstance.post(CREATE_TABLE(indexerId), payload);
+      await handleCreateTable(payload);
 
       toast.success("Table created successfully!");
       onClose();

@@ -1,9 +1,8 @@
-import { ImageAssets } from "public";
-import { AppConstant } from "@/const";
-import { ApiResponse } from "apisauce";
 import { isEmpty } from "lodash";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { BaseResponseData, ResponseDataList } from "@/models/common.model";
+import { AxiosResponse } from "axios";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -40,32 +39,6 @@ export const snakeToCamelCase = (str: string): string => {
       );
 
   return str;
-};
-
-export interface BaseResponseData<T> {
-  statusCode: number;
-  message?: string;
-  error?: string;
-  data: T;
-}
-
-export const getDappServicesResponseData = <T>(
-  response: ApiResponse<BaseResponseData<T>>
-): T | undefined => {
-  const status = response?.status;
-  const data = response?.data;
-
-  if (!status || !data) return undefined;
-
-  if (status >= 400 && status <= 500) return undefined;
-
-  const statusCode = data.statusCode;
-
-  if (statusCode >= 200 && statusCode <= 300) {
-    return response.data?.data;
-  } else {
-    return undefined;
-  }
 };
 
 export const truncateHash = (
@@ -210,3 +183,47 @@ export async function generateCodeChallengeFromVerifier(plain: string) {
   var base64encoded = base64urlencode(hashed);
   return base64encoded;
 }
+
+export const getDappServicesResponseData = <T>(
+  response: AxiosResponse<BaseResponseData<T>>
+): T | undefined => {
+  const status = response?.status;
+  const data = response?.data;
+
+  if (!status || !data) return undefined;
+
+  if (status >= 400 && status <= 500) return undefined;
+
+  const statusCode = data.statusCode;
+
+  if (statusCode >= 200 && statusCode <= 300) {
+    return response.data?.data;
+  } else {
+    return undefined;
+  }
+};
+
+export const getDappServicesResponseListData = <T>(
+  response: AxiosResponse<ResponseDataList<T>>
+):
+  | {
+      pageData: T;
+      pageNum: number;
+      total: number;
+    }
+  | undefined => {
+  const status = response?.status;
+  const data = response?.data;
+
+  if (!status || !data) return undefined;
+
+  if (status >= 400 && status <= 500) return undefined;
+
+  const statusCode = data.statusCode;
+
+  if (statusCode >= 200 && statusCode <= 300) {
+    return response.data?.data;
+  } else {
+    return undefined;
+  }
+};

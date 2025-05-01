@@ -6,10 +6,9 @@ import { CreateTableModal } from "./modals/CreateTableModal";
 import { IndexerTableMetadata } from "@/models/app.model";
 import TableStructure from "./TableStructure";
 import CreateTriggerModal from "./modals/CreateTriggerModal";
-import { axiosInstance } from "@/services/config";
-import { GET_TABLES_INDEXER } from "@/const/api.const";
 import { useAppContext } from "@/context";
 import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
 
 interface TablesAndTriggersViewProps {
   indexerId: number;
@@ -19,6 +18,8 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
   indexerId,
 }) => {
   const { userInfo, indexer } = useAppContext();
+  const { handleGetTablesInIndexer } = useAppHooks();
+
   const isOwnerIndexer =
     !isNil(userInfo) &&
     !isNil(indexer) &&
@@ -31,20 +32,18 @@ const TablesAndTriggersView: FC<TablesAndTriggersViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTables = async () => {
+    const getTables = async () => {
       try {
-        const response = await axiosInstance.get(GET_TABLES_INDEXER(indexerId));
-
-        const data = response?.data.data;
-        setTables(data || []);
+        const response = await handleGetTablesInIndexer(indexerId);
+        setTables(response ?? []);
       } catch (error) {
-        console.error("Error fetching tables:", error);
+        console.error("Error getting tables:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchTables();
+    getTables();
   }, [indexerId, isOpenModalCreateTable, isOpenModalCreateTrigger]);
 
   if (isLoading) {

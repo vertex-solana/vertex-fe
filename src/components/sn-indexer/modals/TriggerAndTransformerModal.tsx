@@ -4,10 +4,9 @@ import { FC, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import { TransformerPda, TriggerAndTransformer } from "@/models/app.model";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { axiosInstance } from "@/services/config";
-import { GET_TRIGGER_TRANSFORMER, UPDATE_TRANSFORMER } from "@/const/api.const";
 import { twJoin } from "tailwind-merge";
 import toast from "react-hot-toast";
+import { useAppHooks } from "@/hooks";
 
 interface TriggerAndTransformerModalProps {
   indexerId: number;
@@ -20,6 +19,9 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
   indexerId,
   onClose,
 }) => {
+  const { handleGetTriggersAndTransformers, handleUpdateTransformerScript } =
+    useAppHooks();
+
   const [triggersAndTransformers, setTriggersAndTransformers] = useState<
     TriggerAndTransformer[]
   >([]);
@@ -35,9 +37,10 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
 
     setIsUpdatingScript(true);
     try {
-      await axiosInstance.patch(UPDATE_TRANSFORMER(indexerId), {
+      await handleUpdateTransformerScript({
+        indexerId,
+        transformerId: selectedTransformer!.id,
         script,
-        transformerId: selectedTransformer?.id,
       });
       toast.success("Script updated successfully");
     } catch (error) {
@@ -50,23 +53,22 @@ const TriggerAndTransformerModal: FC<TriggerAndTransformerModalProps> = ({
   };
 
   useEffect(() => {
-    const fetchDetails = async () => {
+    const getDetails = async () => {
       try {
-        const triggersAndTransformersResponse = await axiosInstance.get(
-          GET_TRIGGER_TRANSFORMER(indexerId, tableId)
+        const response = await handleGetTriggersAndTransformers(
+          indexerId,
+          tableId
         );
-        const data = triggersAndTransformersResponse?.data
-          ?.data as TriggerAndTransformer[];
 
-        setTriggersAndTransformers(data || []);
+        setTriggersAndTransformers(response ?? []);
       } catch (error) {
-        console.error("Error fetching triggers and transformers:", error);
+        console.error("Error getting triggers and transformers:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchDetails();
+    getDetails();
   }, [tableId, isUpdatingScript]);
 
   if (isLoading) {

@@ -1,9 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { GET_IDLS } from "@/const/api.const";
-import { IdlDapp } from "@/models/app.model";
-import { axiosInstance } from "@/services/config";
+import { IdlDappResponse } from "@/models/app.model";
 import {
   ComponentPropsWithoutRef,
   FC,
@@ -20,14 +18,16 @@ import { SearchIcon } from "@/components/icons";
 import { twJoin } from "tailwind-merge";
 import { useAppContext } from "@/context";
 import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
 
 const IDL = () => {
   const { userInfo } = useAppContext();
+  const { handleGetIdls } = useAppHooks();
 
-  const idlsRef = useRef<IdlDapp[]>();
-  const [idls, setIdls] = useState<IdlDapp[]>([]);
+  const idlsRef = useRef<IdlDappResponse[]>();
+  const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedIdl, setSelectedIdl] = useState<IdlDapp | null>(null);
+  const [selectedIdl, setSelectedIdl] = useState<IdlDappResponse | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   useEffect(() => {
@@ -35,18 +35,18 @@ const IDL = () => {
 
     const fetchIdls = async () => {
       try {
-        const response = await axiosInstance.get(GET_IDLS);
-        const data = response?.data?.data;
-
-        setIdls(data || []);
-        idlsRef.current = data || [];
+        const response = await handleGetIdls({});
+        if (response) {
+          setIdls(response.pageData || []);
+          idlsRef.current = response.pageData || [];
+        }
       } catch (error) {
         console.error("Error fetching Idl:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     if (!isNil(userInfo)) {
       fetchIdls();
     } else {
@@ -58,7 +58,7 @@ const IDL = () => {
     return <div>Loading...</div>;
   }
 
-  const handleCardClick = (idl: IdlDapp) => {
+  const handleCardClick = (idl: IdlDappResponse) => {
     setSelectedIdl(idl);
   };
 

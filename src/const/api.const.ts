@@ -16,31 +16,27 @@ export const STT_INTERNAL_SERVER = 500;
 export const STT_NOT_MODIFIED = 304;
 
 // API Path
-export const GET_ACCOUNT = (accountId: number) => `/accounts/${accountId}`;
-export const GET_INDEXERS = "/indexers";
-export const GET_INDEXERS_OWNER = "/indexers/owner";
-export const GET_IDLS = "/idl-dapp";
-
+export const GET_ACCOUNT = `/accounts/{accountId}`;
 export const UPDATE_USERNAME = "accounts/update-user-name";
 
-export const EXECUTE_QUERY = "/indexers/query";
+// IDL Path
+export const GET_IDLS = "/idl-dapp";
 
-export const GET_INDEXER = (indexerId: number) => `/indexers/${indexerId}`;
-export const GET_QUERY_LOG = (indexerId: number) =>
-  `/indexers/${indexerId}/query`;
-export const CREATE_QUERY_LOG = (indexerId: number) =>
-  `/indexers/${indexerId}/query`;
-export const CREATE_INDEXER = "/indexers/create";
-export const GET_TABLES_INDEXER = (indexerId: number) =>
-  `/indexers/${indexerId}/tables`;
-export const GET_TRIGGER_TRANSFORMER = (indexerId: number, tableId: number) =>
-  `/indexers/${indexerId}/tables/${tableId}/trigger-transformer`;
+export const UPLOAD_IDL = `${GET_IDLS}/upload`;
 
-export const CREATE_TABLE = (indexerId: number) =>
-  `/indexers/${indexerId}/tables/create`;
-export const CREATE_TRIGGER_TRANSFORMER = (indexerId: number) =>
-  `/indexers/${indexerId}/register`;
-export const UPDATE_TRANSFORMER = (indexerId: number) =>
-  `/indexers/${indexerId}/transformers`;
+// Indexer Path
+export const GET_INDEXERS = "/indexers";
+export const GET_INDEXERS_OWNER = `${GET_INDEXERS}/owner`;
 
-export const UPLOAD_IDL = "/idl-dapp/upload";
+export const GET_INDEXER_DETAIL = `/indexers/{indexerId}`;
+export const GET_TABLES_INDEXER = `${GET_INDEXERS}/{indexerId}/tables`;
+export const GET_TRIGGER_TRANSFORMER = `${GET_INDEXERS}/{indexerId}/tables/{tableId}/trigger-transformer`;
+
+export const CREATE_INDEXER = `${GET_INDEXERS}/create`;
+export const CREATE_TABLE = `${GET_INDEXERS}/{indexerId}/tables/create`;
+export const CREATE_TRIGGER_TRANSFORMER = `${GET_INDEXERS}/{indexerId}/register`;
+export const UPDATE_TRANSFORMER = `${GET_INDEXERS}/{indexerId}/transformers`;
+
+export const GET_QUERY_LOG = `${GET_INDEXERS}/{indexerId}/query`;
+export const EXECUTE_QUERY = `${GET_INDEXERS}/query`;
+export const CREATE_QUERY_LOG = `${GET_INDEXERS}/{indexerId}/query`;

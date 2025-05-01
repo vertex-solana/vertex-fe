@@ -17,10 +17,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { axiosInstance } from "@/services/config";
-import { CREATE_QUERY_LOG } from "@/const/api.const";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/context";
+import { useAppHooks } from "@/hooks";
 
 const formSchema = z.object({
   query: z.string().optional(),
@@ -39,6 +38,8 @@ const CreateQueryLogModal: FC<CreateQueryLogModalProps> = ({
   onClose,
 }) => {
   const { indexer } = useAppContext();
+  const { handleCreateQueryLog } = useAppHooks();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,10 +56,10 @@ const CreateQueryLogModal: FC<CreateQueryLogModalProps> = ({
       const payload = {
         query,
         description: values.description.trim(),
-        indexerId: indexer?.id,
+        indexerId: indexer!.id,
       };
 
-      await axiosInstance.post(CREATE_QUERY_LOG(indexer!.id), payload);
+      await handleCreateQueryLog(payload);
 
       toast.success("Create Query Log successfully!");
       onClose();

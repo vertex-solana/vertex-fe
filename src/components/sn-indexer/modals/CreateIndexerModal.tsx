@@ -24,11 +24,10 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IdlDapp } from "@/models/app.model";
-import { axiosInstance } from "@/services/config";
-import { CREATE_INDEXER } from "@/const/api.const";
+import { IdlDappResponse } from "@/models/app.model";
 import { Textarea } from "@/components/ui/textarea";
 import { Cluster } from "@/const/app.const";
+import { useAppHooks } from "@/hooks";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -41,7 +40,7 @@ const formSchema = z.object({
 interface CreateIndexerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  idls: IdlDapp[];
+  idls: IdlDappResponse[];
 }
 
 const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
@@ -49,6 +48,8 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
   onClose,
   idls,
 }) => {
+  const { handleCreateIndexer } = useAppHooks();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -76,7 +77,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
         programId: values.programId.trim(),
       };
 
-      await axiosInstance.post(CREATE_INDEXER, payload);
+      await handleCreateIndexer(payload);
 
       toast.success("Indexer created successfully!");
       onClose();

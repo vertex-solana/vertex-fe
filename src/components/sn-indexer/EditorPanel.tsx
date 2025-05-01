@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { ExecuteQueryResponse, QueryLogResponse } from "@/models/app.model";
 import { isNil } from "lodash";
 import DataViewManager from "./DataViewmanager";
-import { axiosInstance } from "@/services/config";
-import { EXECUTE_QUERY, GET_QUERY_LOG } from "@/const/api.const";
 import { useAppContext } from "@/context";
+import { useAppHooks } from "@/hooks";
 
 const EditorPanel = () => {
   const { indexer } = useAppContext();
+  const { handleExecuteQuery, handleGetAllQueryLogs } = useAppHooks();
 
   const [query, setQuery] = useState<string>(
     "SELECT * FROM table_name LIMIT 10"
@@ -24,9 +24,9 @@ const EditorPanel = () => {
 
   useEffect(() => {
     const getAllQuery = async () => {
-      const response = await axiosInstance.get(GET_QUERY_LOG(indexer!.id));
+      const response = await handleGetAllQueryLogs(indexer!.id);
 
-      setQueryLog(response?.data.data || []);
+      setQueryLog(response ?? []);
     };
 
     getAllQuery();
@@ -35,9 +35,8 @@ const EditorPanel = () => {
   const executeQuery = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post(EXECUTE_QUERY, { query });
-
-      setResult(response?.data?.data || []);
+      const response = await handleExecuteQuery(query);
+      setResult(response ?? null);
     } catch (error) {
       console.error("Error executing query:", error);
     } finally {
