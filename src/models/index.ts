@@ -4,9 +4,6 @@ export type { UserInfoInterface };
 
 export { SolanaWalletsEnum };
 
-import {
-  SocialPlatformEnum,
-  BlockchainTransactionStatusEnum,
-} from "./common.model";
+import { BlockchainTransactionStatusEnum } from "./common.model";
 
 export { BlockchainTransactionStatusEnum };
