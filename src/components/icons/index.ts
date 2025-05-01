@@ -47,8 +47,12 @@ import ArrowDirectionIcon from "./ArrowDirectionIcon";
 import AutomatedStrategyIcon from "./AutomatedStrategyIcon";
 import LPLeverageStrategyIcon from "./LPLeverageStrategyIcon";
 import SelfPickedStrategyIcon from "./SelfPickedStrategyIcon";
+import ArrowDownFillIcon from "./ArrowDownFillIcon";
+import ArrowEndIcon from "./ArrowEndIcon";
 
 export {
+  ArrowDownFillIcon,
+  ArrowEndIcon,
   ChatIcon,
   CopyIcon,
   BlogIcon,
