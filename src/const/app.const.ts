@@ -29,12 +29,8 @@ export const BREAK_POINTS = {
 
 export const GOOGLE_ANALYTICS_ID = "G-G2M5X8ZT8R";
 
-// Sample
-export const META_DATA_HOME_DEFAULT = {
-  title: "Enso DeFAI Agents Suite (E.D.A.S)",
-  description:
-    "Deliver DeFAI agents that automate lending, liquidity, and LST strategies across chains for superior returns with minimal effort",
-  url: "https://defai.ensofi.xyz/",
-  siteName: "Defai",
-  urlImage: "https://defai.s3.ap-southeast-1.amazonaws.com/defai_metadata.png",
-};
+export enum Cluster {
+  MAINNET = "mainnet",
+  DEVNET = "devnet",
+  TESTNET = "testnet",
+}

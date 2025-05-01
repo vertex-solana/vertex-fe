@@ -1,16 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
 import { usePathname } from "next/navigation";
 import EditorPanel from "@/components/sn-indexer/EditorPanel";
+import { useAppContext } from "@/context";
+import { useAppHooks } from "@/hooks";
 
 const IndexerItem = () => {
   const indexerId = Number(usePathname().split("/indexers/").pop());
 
+  const { setIndexer } = useAppContext();
+  const { handleGetIndexerDetail } = useAppHooks();
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const getIndexer = async () => {
+      try {
+        setIsLoading(true);
+        const response = await handleGetIndexerDetail(indexerId);
+
+        if (response) {
+          setIndexer(response);
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching indexer:", error);
+        setIsLoading(false);
+      }
+    };
+
+    getIndexer();
+  }, [indexerId]);
+
   const [activeTab, setActiveTab] = useState("tables");
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex h-screen w-full border-t border-gray-800">
@@ -32,7 +63,7 @@ const IndexerItem = () => {
           </TabsList>
         </div>
 
-        <div className="flex-1 p-6 overflow-auto h-full">
+        <div className="flex-1 p-6 h-full w-full overflow-auto">
           <TabsContent value="tables" className="h-full">
             <TablesAndTriggersView indexerId={indexerId} />
           </TabsContent>

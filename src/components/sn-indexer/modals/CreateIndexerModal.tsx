@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import * as Tooltip from "@radix-ui/react-tooltip";
 
 import { Modal } from "@/components/ui/Modal";
 import {
@@ -25,39 +24,39 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IdlDapp, RpcResponse } from "@/models/app.model";
-import { axiosInstance } from "@/services/config";
-import { CREATE_INDEXER } from "@/const/api.const";
+import { IdlDappResponse } from "@/models/app.model";
 import { Textarea } from "@/components/ui/textarea";
+import { Cluster } from "@/const/app.const";
+import { useAppHooks } from "@/hooks";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
   description: z.string().min(1, "Description is required."),
   programId: z.string().min(1, "Program ID is required."),
   idlId: z.string().optional(),
-  rpcId: z.string().min(1, "RPC is required."),
+  cluster: z.string().min(1, "Cluster is required."),
 });
 
 interface CreateIndexerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  idls: IdlDapp[];
-  rpcs: RpcResponse[];
+  idls: IdlDappResponse[];
 }
 
 const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
   isOpen,
   onClose,
   idls,
-  rpcs,
 }) => {
+  const { handleCreateIndexer } = useAppHooks();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       idlId: "",
-      rpcId: "",
+      cluster: "",
       name: "",
       description: "",
       programId: "",
@@ -73,12 +72,12 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
       const payload = {
         name: values.name.trim(),
         idlId,
-        rpcId: Number(values.rpcId),
+        cluster: values.cluster,
         description: values.description.trim(),
         programId: values.programId.trim(),
       };
 
-      await axiosInstance.post(CREATE_INDEXER, payload);
+      await handleCreateIndexer(payload);
 
       toast.success("Indexer created successfully!");
       onClose();
@@ -193,10 +192,10 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
               />
               <FormField
                 control={form.control}
-                name="rpcId"
+                name="cluster"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>RPC:</FormLabel>
+                    <FormLabel>Cluster:</FormLabel>
                     <FormControl>
                       <Select
                         disabled={isLoading}
@@ -206,10 +205,10 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                           <SelectValue placeholder="Select a table" />
                         </SelectTrigger>
                         <SelectContent>
-                          {rpcs.map((rpc) => (
-                            <SelectItem key={rpc.id} value={rpc.id.toString()}>
+                          {Object.values(Cluster).map((cluster, index) => (
+                            <SelectItem key={index} value={cluster}>
                               <div className="flex items-center">
-                                <span>{rpc.cluster}</span>
+                                <span>{cluster}</span>
                               </div>
                             </SelectItem>
                           ))}

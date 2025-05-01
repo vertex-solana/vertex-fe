@@ -14,8 +14,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
-import { axiosInstance } from "@/services/config";
-import { UPLOAD_IDL } from "@/const/api.const";
+import { useAppHooks } from "@/hooks";
 
 const formSchema = z.object({
   programId: z.string().min(1, "Program ID is required."),
@@ -32,6 +31,8 @@ export const UploadIdlModal: FC<UploadIdlModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { handleUploadIdl } = useAppHooks();
+
   const [isLoading, setIsLoading] = useState(false);
   const [idlFile, setIdlFile] = useState<File | null>(null);
 
@@ -62,16 +63,11 @@ export const UploadIdlModal: FC<UploadIdlModalProps> = ({
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("programId", values.programId.trim());
-      formData.append("version", values.version.trim());
-      formData.append("name", values.name.trim());
-      formData.append("idlJson", idlFile);
-
-      await axiosInstance.post(UPLOAD_IDL, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      await handleUploadIdl({
+        idlFile,
+        programId: values.programId.trim(),
+        version: values.version.trim(),
+        name: values.name.trim(),
       });
 
       toast.success("IDL uploaded successfully!");

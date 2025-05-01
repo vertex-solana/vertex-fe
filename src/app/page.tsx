@@ -1,18 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { axiosInstance } from "@/services/config";
 import {
-  GET_IDLS,
-  GET_INDEXERS,
-  GET_INDEXERS_OWNER,
-  GET_RPC,
-} from "@/const/api.const";
-import {
-  IdlDapp,
+  IdlDappResponse,
   IndexerResponse,
   IndexerTypeEnum,
-  RpcResponse,
 } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
@@ -23,14 +15,17 @@ import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context";
 import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
 
 const Home = () => {
   const router = useRouter();
   const { userInfo, setIndexer } = useAppContext();
+  const { handleGetAllIndexers, handleGetIndexersOwner, handleGetIdls } =
+    useAppHooks();
+
   const [allIndexers, setAllIndexers] = useState<IndexerResponse[]>([]);
   const [ownerIndexers, setOwnerIndexers] = useState<IndexerResponse[]>([]);
-  const [idls, setIdls] = useState<IdlDapp[]>([]);
-  const [rpcs, setRpcs] = useState<RpcResponse[]>([]);
+  const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
 
@@ -55,65 +50,58 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const fetchIdls = async () => {
+    const getIdls = async () => {
       try {
-        const response = await axiosInstance.get(GET_IDLS);
-        const data = response?.data?.data;
-
-        setIdls(data || []);
+        // TODO: Handle Pagination
+        const response = await handleGetIdls({});
+        if (response) {
+          setIdls(response.pageData || []);
+        }
       } catch (error) {
         console.error("Error fetching Idl:", error);
       }
     };
-    fetchIdls();
-
-    const fetchRpcs = async () => {
-      try {
-        const response = await axiosInstance.get(GET_RPC);
-        const data = response?.data?.data;
-        setRpcs(data || []);
-      } catch (error) {
-        console.error("Error fetching RPCs:", error);
-      }
-    };
-
-    fetchRpcs();
+    getIdls();
   }, [isOpenCreateModal]);
 
   useEffect(() => {
-    const fetchIndexersOwner = async () => {
+    const getIndexersOwner = async () => {
       try {
         if (isNil(userInfo)) {
           setOwnerIndexers([]);
         } else {
-          const response = await axiosInstance.get(GET_INDEXERS_OWNER);
-          const data = response?.data?.data;
+          // TODO: Handle Pagination
+          const response = await handleGetIndexersOwner({});
 
-          setOwnerIndexers(data || []);
+          if (response) {
+            setOwnerIndexers(response.pageData || []);
+          }
         }
       } catch (error) {
         console.error("Error fetching indexers:", error);
       }
     };
 
-    const fetchAllIndexers = async () => {
+    const getAllIndexers = async () => {
       try {
         if (isNil(userInfo)) {
           setAllIndexers([]);
         } else {
-          const response = await axiosInstance.get(GET_INDEXERS);
-          const data = response?.data?.data;
+          // TODO: Handle Pagination
+          const response = await handleGetAllIndexers({});
 
-          setAllIndexers(data || []);
+          if (response) {
+            setAllIndexers(response.pageData || []);
+          }
         }
       } catch (error) {
         console.error("Error fetching indexers:", error);
       }
     };
 
-    fetchAllIndexers();
-    fetchIndexersOwner();
-  }, [userInfo]);
+    getAllIndexers();
+    getIndexersOwner();
+  }, [userInfo, isOpenCreateModal]);
 
   useEffect(() => {
     const filterIndexers =
@@ -179,16 +167,17 @@ const Home = () => {
           <div className="w-full rounded-b-xl border border-border p-4 bg-[#0a0a0b]/90  min-h-[450px] flex items-center flex-col gap-y-1">
             {indexers.length > 0 ? (
               <div className="w-full ">
-                <div className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
+                <div className="flex items-center w-full grid grid-cols-[20%_50%_10%_20%] px-4 py-2 bg-characterBackground2 rounded-t-lg text-sm text-neutral5">
                   <p>Name</p>
                   <p>Description</p>
                   <p>Cluster</p>
+                  <p>Author</p>
                 </div>
                 <div className="flex flex-col sm:h-[330px] overflow-y-auto">
                   {indexers?.map((indexer) => (
                     <div
                       key={indexer.id}
-                      className="flex items-center w-full grid grid-cols-[20%_70%_10%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
+                      className="flex items-center w-full grid grid-cols-[20%_50%_10%_20%] px-4 py-4 border-b border-neutral6 font-medium text-sm sm:text-base hover:bg-white/5"
                     >
                       <p>{indexer.name}</p>
                       <button
@@ -203,6 +192,10 @@ const Home = () => {
                       </button>
                       <p className="text-primary5 text-start truncate">
                         {indexer.cluster}
+                      </p>
+
+                      <p className="text-primary5 text-start truncate">
+                        {indexer.owner.userName}
                       </p>
                     </div>
                   ))}
@@ -224,7 +217,6 @@ const Home = () => {
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
-          rpcs={rpcs}
         />
       )}
     </div>

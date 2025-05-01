@@ -24,6 +24,7 @@ export interface IndexerResponse {
   slug: string;
   cluster: string;
   ownerAccountId: number;
+  owner: UserInfoInterface;
 }
 
 export enum TriggerType {
@@ -66,7 +67,7 @@ export interface TriggerAndTransformer {
   indexerId: number;
 }
 
-export interface IdlDapp {
+export interface IdlDappResponse {
   id: number;
   name: string;
   version: string;
@@ -74,10 +75,11 @@ export interface IdlDapp {
   programId: string;
 }
 
-export interface RpcResponse {
+export interface QueryLogResponse {
   id: number;
-  url: string;
-  cluster: string;
+  description: string;
+  query: string;
+  indexerId: number;
 }
 
 export enum IndexerTypeEnum {

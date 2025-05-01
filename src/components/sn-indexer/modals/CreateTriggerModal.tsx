@@ -25,8 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "react-hot-toast";
 import { IndexerTableMetadata, TriggerType } from "@/models/app.model";
-import { axiosInstance } from "@/services/config";
-import { CREATE_TRIGGER_TRANSFORMER } from "@/const/api.const";
+import { useAppHooks } from "@/hooks";
 
 const triggerSchema = z.object({
   tableId: z.string().min(1, "Table is required."),
@@ -48,6 +47,8 @@ const CreateTriggerModal = ({
   tables,
   indexerId,
 }: CreateTriggerModalProps) => {
+  const { handlerCreateTriggerAndTransformer } = useAppHooks();
+
   const [transformCode, setTransformCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -78,23 +79,14 @@ const CreateTriggerModal = ({
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("tableId", values.tableId);
-      formData.append("triggerType", values.triggerType);
-      formData.append("pdaPubkey", values.pdaPubkey.trim());
-      formData.append("pdaName", values.pdaName.trim());
-      const blob = new Blob([transformCode], { type: "text/javascript" });
-      formData.append("transformer", blob, "transform.js");
-
-      await axiosInstance.post(
-        CREATE_TRIGGER_TRANSFORMER(indexerId),
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await handlerCreateTriggerAndTransformer({
+        indexerId,
+        tableId: Number(values.tableId),
+        triggerType: values.triggerType,
+        pdaPubkey: values.pdaPubkey.trim(),
+        pdaName: values.pdaName.trim(),
+        transformCode: transformCode,
+      });
 
       toast.success("Trigger created successfully!");
       onClose();

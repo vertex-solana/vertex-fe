@@ -7,12 +7,22 @@ import TableData from "./TableData";
 // import BarChartView from "./BarChartView";
 // import CounterView from "./CounterView";
 import { ExecuteQueryResponse } from "@/models/app.model";
+import { Button } from "../ui/button";
+import CreateQueryLogModal from "./modals/CreateQuerylogModal";
 
 type DataViewManagerProps = {
   responseQuery: ExecuteQueryResponse | null;
+  currentQuery: string;
+  isCreateQueryLogModalOpen: boolean;
+  setIsCreateQueryLogModalOpen: (value: boolean) => void;
 };
 
-const DataViewManager = ({ responseQuery }: DataViewManagerProps) => {
+const DataViewManager = ({
+  responseQuery,
+  currentQuery,
+  isCreateQueryLogModalOpen,
+  setIsCreateQueryLogModalOpen,
+}: DataViewManagerProps) => {
   const [activeView, setActiveView] = useState("table");
 
   if (!responseQuery) {
@@ -26,7 +36,7 @@ const DataViewManager = ({ responseQuery }: DataViewManagerProps) => {
         value={activeView}
         onValueChange={setActiveView}
       >
-        <div className="sticky top-0 flex items-center justify-between mb-4">
+        <div className="sticky top-0 flex items-center justify-between mb-4 mt-4">
           <TabsList className="bg-slate-800 z-10 shadow-md">
             <TabsTrigger value="table" className="flex items-center gap-2">
               <Table size={16} />
@@ -41,6 +51,17 @@ const DataViewManager = ({ responseQuery }: DataViewManagerProps) => {
               <span>Counter</span>
             </TabsTrigger>
           </TabsList>
+
+          <Button onClick={() => setIsCreateQueryLogModalOpen(true)}>
+            Save this query
+          </Button>
+          {isCreateQueryLogModalOpen && (
+            <CreateQueryLogModal
+              isOpen={isCreateQueryLogModalOpen}
+              onClose={() => setIsCreateQueryLogModalOpen(false)}
+              query={currentQuery}
+            />
+          )}
         </div>
 
         <TabsContent value="table" className="mt-0">

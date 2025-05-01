@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { jwtDecode } from "jwt-decode";
-import { useAppService } from "@/hooks";
+import { useAppHooks } from "@/hooks";
 import Image from "next/image";
 import { ImageAssets } from "public";
 import { DropdownContent, DropdownRoot, DropdownTrigger } from "../common";
@@ -34,7 +34,7 @@ const navigationIndexer: NavItem[] = [
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
-  const { handleGetUserInfo } = useAppService();
+  const { handleGetUserInfo } = useAppHooks();
   const { userInfo, setIndexer, setUserInfo } = useAppContext();
   const router = useRouter();
 
