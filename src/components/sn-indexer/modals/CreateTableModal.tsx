@@ -31,7 +31,7 @@ const TypeColumn = [
   "varchar",
   "bigint",
   "integer",
-  "double",
+  "double precision",
   "boolean",
   "timestamp",
   "date",
@@ -114,7 +114,7 @@ export const CreateTableModal: FC<CreateTableModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
     >
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-[500px] overflow-y-auto">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="space-y-4">
