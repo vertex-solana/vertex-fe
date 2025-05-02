@@ -90,7 +90,7 @@ const Home = () => {
 
   useEffect(() => {
     handleGetIndexerData(selectedTypeIndexer, 1, 5);
-  }, [selectedTypeIndexer]);
+  }, [selectedTypeIndexer, userInfo]);
 
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
