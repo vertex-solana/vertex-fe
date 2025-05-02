@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
-import { CommonInput } from "@/components/common";
+import { CommonInput, CommonPagination } from "@/components/common";
 import { SearchIcon } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
@@ -23,8 +23,6 @@ const Home = () => {
   const { handleGetAllIndexers, handleGetIndexersOwner, handleGetIdls } =
     useAppHooks();
 
-  const [allIndexers, setAllIndexers] = useState<IndexerResponse[]>([]);
-  const [ownerIndexers, setOwnerIndexers] = useState<IndexerResponse[]>([]);
   const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
@@ -32,19 +30,15 @@ const Home = () => {
   const [selectedTypeIndexer, setSelectedTypeIndexer] = useState(
     IndexerTypeEnum.All
   );
+  const [pagingData, setPagingData] = useState({
+    totalItem: 0,
+    currentPage: 1,
+  });
 
   const handleSearch = (valueSearch: string) => {
-    let filterIndexers = [];
-
-    if (selectedTypeIndexer === IndexerTypeEnum.Owner) {
-      filterIndexers = ownerIndexers.filter((item) =>
-        item.name.toLocaleLowerCase().includes(valueSearch)
-      );
-    } else {
-      filterIndexers = allIndexers.filter((item) =>
-        item.name.toLocaleLowerCase().includes(valueSearch)
-      );
-    }
+    const filterIndexers = indexers.filter((item) =>
+      item.name.toLocaleLowerCase().includes(valueSearch)
+    );
 
     setIndexers(filterIndexers || []);
   };
@@ -64,53 +58,39 @@ const Home = () => {
     getIdls();
   }, [isOpenCreateModal]);
 
-  useEffect(() => {
-    const getIndexersOwner = async () => {
-      try {
-        if (isNil(userInfo)) {
-          setOwnerIndexers([]);
+  const handleGetIndexerData = async (
+    indexerType: IndexerTypeEnum,
+    pageNum: number,
+    pageSize: number
+  ) => {
+    try {
+      if (isNil(userInfo)) {
+        setIndexers([]);
+      } else {
+        let response;
+
+        if (indexerType === IndexerTypeEnum.Owner) {
+          response = await handleGetIndexersOwner({ pageNum, pageSize });
         } else {
-          // TODO: Handle Pagination
-          const response = await handleGetIndexersOwner({});
-
-          if (response) {
-            setOwnerIndexers(response.pageData || []);
-          }
+          response = await handleGetAllIndexers({ pageNum, pageSize });
         }
-      } catch (error) {
-        console.error("Error fetching indexers:", error);
-      }
-    };
 
-    const getAllIndexers = async () => {
-      try {
-        if (isNil(userInfo)) {
-          setAllIndexers([]);
-        } else {
-          // TODO: Handle Pagination
-          const response = await handleGetAllIndexers({});
-
-          if (response) {
-            setAllIndexers(response.pageData || []);
-          }
+        if (response) {
+          setIndexers(response.pageData || []);
+          setPagingData({
+            currentPage: response.pageNum || 1,
+            totalItem: response.total || 0,
+          });
         }
-      } catch (error) {
-        console.error("Error fetching indexers:", error);
       }
-    };
-
-    getAllIndexers();
-    getIndexersOwner();
-  }, [userInfo, isOpenCreateModal]);
+    } catch (error) {
+      console.error("Error fetching indexers:", error);
+    }
+  };
 
   useEffect(() => {
-    const filterIndexers =
-      selectedTypeIndexer === IndexerTypeEnum.Owner
-        ? ownerIndexers
-        : allIndexers;
-
-    setIndexers(filterIndexers);
-  }, [selectedTypeIndexer, allIndexers, ownerIndexers]);
+    handleGetIndexerData(selectedTypeIndexer, 1, 5);
+  }, [selectedTypeIndexer]);
 
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
@@ -143,7 +123,14 @@ const Home = () => {
                   "p-2 min-w-[74px] text-sm rounded-lg",
                   item === selectedTypeIndexer && "bg-[#6d2ef4]"
                 )}
-                onClick={() => setSelectedTypeIndexer(item)}
+                onClick={() => {
+                  setSelectedTypeIndexer(item);
+                  setPagingData({
+                    totalItem: 0,
+                    currentPage: 1,
+                  });
+                  handleGetIndexerData(item, 1, 5);
+                }}
               >
                 {item}
               </button>
@@ -200,6 +187,17 @@ const Home = () => {
                     </div>
                   ))}
                 </div>
+                <CommonPagination
+                  currentPage={pagingData?.currentPage}
+                  totalItem={pagingData?.totalItem}
+                  onChangePagination={(data) =>
+                    handleGetIndexerData(
+                      selectedTypeIndexer,
+                      data.pageNum,
+                      data.pageSize
+                    )
+                  }
+                />
               </div>
             ) : (
               <div className="w-full h-full ">
