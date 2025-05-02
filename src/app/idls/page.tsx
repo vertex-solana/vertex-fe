@@ -13,7 +13,7 @@ import IdlView from "@/components/sn-idl/modal/IdlView";
 import { UploadIdlModal } from "@/components/sn-idl/modal/UploadIdlModal";
 import { CopyIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
-import { CommonInput } from "@/components/common";
+import { CommonInput, CommonPagination } from "@/components/common";
 import { SearchIcon } from "@/components/icons";
 import { twJoin } from "tailwind-merge";
 import { useAppContext } from "@/context";
@@ -30,15 +30,26 @@ const IDL = () => {
   const [selectedIdl, setSelectedIdl] = useState<IdlDappResponse | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
+  const [pagingData, setPagingData] = useState({
+    totalItem: 0,
+    currentPage: 1,
+  });
+
+  const [pagingParams, setPagingParams] = useState({ pageNum: 1, pageSize: 5 });
+
   useEffect(() => {
     setIsLoading(true);
 
     const fetchIdls = async () => {
       try {
-        const response = await handleGetIdls({});
+        const response = await handleGetIdls(pagingParams);
         if (response) {
           setIdls(response.pageData || []);
           idlsRef.current = response.pageData || [];
+          setPagingData({
+            currentPage: response.pageNum,
+            totalItem: response.total,
+          });
         }
       } catch (error) {
         console.error("Error fetching Idl:", error);
@@ -52,7 +63,7 @@ const IDL = () => {
     } else {
       setIsLoading(false);
     }
-  }, [isUploadModalOpen]);
+  }, [isUploadModalOpen, pagingParams]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -110,6 +121,15 @@ const IDL = () => {
             />
           ))}
         </div>
+
+        {idls?.length > 0 && (
+          <CommonPagination
+            className="mx-auto"
+            currentPage={pagingData?.currentPage}
+            totalItem={pagingData?.totalItem}
+            onChangePagination={(data) => setPagingParams(data)}
+          />
+        )}
       </div>
       <Button
         className="w-[100px] fixed bottom-4 right-4 z-40"

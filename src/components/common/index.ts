@@ -12,6 +12,7 @@ import {
   DropdownTrigger,
   DropdownContent,
 } from "./common-dropdown";
+import CommonPagination from "./common-panigation";
 
 import { TabsRoot, TabsList, TabsTrigger, TabsContent } from "./common-tabs";
 
@@ -47,4 +48,5 @@ export {
   DropdownContent,
   CommonToggleButton,
   CommonTransactionToast,
+  CommonPagination,
 };
