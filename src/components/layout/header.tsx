@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -19,6 +19,7 @@ import { ImageAssets } from "public";
 import { DropdownContent, DropdownRoot, DropdownTrigger } from "../common";
 import { ArrowIcon, LogoutIcon } from "../icons";
 import { useAppContext } from "@/context";
+import WalletConnect from "./main-layout/WalletConnect";
 
 type NavItem = {
   label: string;
@@ -174,9 +175,7 @@ export default function Header() {
                 </DropdownContent>
               </DropdownRoot>
             ) : (
-              <Button size="lg" className="group" onClick={handleSignIn}>
-                Sign In with Google
-              </Button>
+              <WalletConnect />
             )}
           </div>
 

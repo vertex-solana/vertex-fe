@@ -11,11 +11,9 @@ import { LedgerWalletAdapter } from "@solana/wallet-adapter-wallets";
 const SolanaProvider = ({ children }: PropsWithChildren) => {
   const endpoint = BlockChainUtils.getSolanaRpcEndpoint();
 
-  const wallets = useMemo(() => [new LedgerWalletAdapter()], []);
-
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider autoConnect wallets={wallets}>
+      <WalletProvider autoConnect wallets={[]}>
         {children}
       </WalletProvider>
     </ConnectionProvider>
