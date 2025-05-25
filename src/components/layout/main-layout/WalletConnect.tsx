@@ -7,29 +7,39 @@ import { useAuthContext } from "@/context";
 import { SolanaWalletsEnum } from "@/models";
 
 const WalletConnect = () => {
-  const { wallets, select } = useWallet();
+  const { wallets, select, publicKey, wallet } = useWallet();
 
-  const { handleLoginWallet, setWalletConnect, setIsLoggedIn } =
+  const { handleLoginWallet, setWalletConnect, setIsLoggedIn, isLoggedIn } =
     useAuthContext();
 
   const [isOpen, setIsOpen] = useState(false);
 
   const handleConnect = async (wallet: Wallet) => {
-    try {
-      select(wallet.adapter.name);
-      setIsOpen(false);
-
-      await handleLoginWallet({
-        walletAddress: wallet.adapter.publicKey!.toBase58(),
-        walletType: wallet.adapter.name as SolanaWalletsEnum,
-      });
-
-      setWalletConnect(wallet.adapter.publicKey!.toBase58());
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.log(error);
-    }
+    select(wallet.adapter.name);
+    setIsOpen(false);
   };
+
+  useEffect(() => {
+    const login = async () => {
+      if (!publicKey || !wallet || isLoggedIn) return;
+
+      try {
+        const address = publicKey.toBase58();
+
+        await handleLoginWallet({
+          walletAddress: address,
+          walletType: wallet.adapter.name as SolanaWalletsEnum,
+        });
+
+        setWalletConnect(address);
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error("Login error:", error);
+      }
+    };
+
+    login();
+  }, [publicKey, wallet]);
 
   return (
     <>

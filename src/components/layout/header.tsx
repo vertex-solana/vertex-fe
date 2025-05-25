@@ -37,7 +37,7 @@ export default function Header() {
 
   const { handleGetUserInfo } = useAppHooks();
   const { userInfo, setIndexer, setUserInfo } = useAppContext();
-  const { handleLogout, isLoggedIn, setIsLoggedIn } = useAuthContext();
+  const { handleLogout, isLoggedIn, setIsLoggedIn, setWalletConnect } = useAuthContext();
 
   const router = useRouter();
 
@@ -66,6 +66,7 @@ export default function Header() {
     setIndexer(null);
     await handleLogout();
     setIsLoggedIn(false);
+    setWalletConnect(null);
     router.push("/");
   };
 
