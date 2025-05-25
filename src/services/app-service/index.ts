@@ -1,19 +1,3 @@
-import {
-  CREATE_INDEXER,
-  CREATE_QUERY_LOG,
-  CREATE_TABLE,
-  CREATE_TRIGGER_TRANSFORMER,
-  EXECUTE_QUERY,
-  GET_IDLS,
-  GET_INDEXER_DETAIL,
-  GET_INDEXERS,
-  GET_INDEXERS_OWNER,
-  GET_QUERY_LOG,
-  GET_TABLES_INDEXER,
-  GET_TRIGGER_TRANSFORMER,
-  UPDATE_TRANSFORMER,
-  UPLOAD_IDL,
-} from "@/const/api.const";
 import { axiosInstance } from "../config";
 import {
   CreateIndexerPayload,
@@ -33,14 +17,56 @@ import {
 } from "@/models/common.model";
 import {
   ExecuteQueryResponse,
+  GetNonceResponse,
   IdlDappResponse,
   IndexerResponse,
   IndexerTableMetadata,
+  PostLoginResponse,
   QueryLogResponse,
   TriggerAndTransformer,
 } from "@/models/app.model";
 import { CommonUtils } from "@/utils";
 import StringFormat from "string-format";
+import { ApiConstant } from "@/const";
+
+export const getNonceService = async (walletAddress: string) => {
+  const apiUrl = StringFormat(ApiConstant.GET_NONCE, { walletAddress });
+
+  const response: AxiosResponse<BaseResponseData<GetNonceResponse>> =
+    await axiosInstance.get(apiUrl);
+
+  const responseData = CommonUtils.getDappServicesResponseData(response);
+
+  if (responseData) {
+    return responseData as GetNonceResponse;
+  } else {
+    return undefined;
+  }
+};
+
+export const postLoginService = async (
+  walletAddress: string,
+  signature: string
+) => {
+  const apiUrl = ApiConstant.POST_LOGIN;
+
+  const response: AxiosResponse<BaseResponseData<PostLoginResponse>> =
+    await axiosInstance.post(apiUrl, {
+      walletAddress,
+      signature,
+    });
+
+  const responseData = CommonUtils.getDappServicesResponseData(response);
+
+  if (responseData) {
+    return {
+      accessToken: responseData.accessToken,
+      refreshToken: responseData?.refreshToken || "",
+    } as PostLoginResponse;
+  } else {
+    return { accessToken: "", refreshToken: "" } as PostLoginResponse;
+  }
+};
 
 export const getAllIndexers = async (
   params: GetAllIndexersParams
@@ -51,7 +77,7 @@ export const getAllIndexers = async (
     };
 
     const response: AxiosResponse<ResponseDataList<IndexerResponse[]>> =
-      await axiosInstance.get(GET_INDEXERS, {
+      await axiosInstance.get(ApiConstant.GET_INDEXERS, {
         params: queryParams,
       });
 
@@ -77,7 +103,7 @@ export const getIndexerOwner = async (
     };
 
     const response: AxiosResponse<ResponseDataList<IndexerResponse[]>> =
-      await axiosInstance.get(GET_INDEXERS_OWNER, {
+      await axiosInstance.get(ApiConstant.GET_INDEXERS_OWNER, {
         params: queryParams,
       });
 
@@ -103,7 +129,7 @@ export const getIdls = async (
     };
 
     const response: AxiosResponse<ResponseDataList<IdlDappResponse[]>> =
-      await axiosInstance.get(GET_IDLS, {
+      await axiosInstance.get(ApiConstant.GET_IDLS, {
         params: queryParams,
       });
 
@@ -128,7 +154,7 @@ export const uploadIdl = async (payload: UploadIdlPayload): Promise<void> => {
     formData.append("name", payload.name.trim());
     formData.append("idlJson", payload.idlFile);
 
-    await axiosInstance.post(UPLOAD_IDL, formData, {
+    await axiosInstance.post(ApiConstant.UPLOAD_IDL, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -143,7 +169,7 @@ export const createIndexer = async (
   payload: CreateIndexerPayload
 ): Promise<void> => {
   try {
-    await axiosInstance.post(CREATE_INDEXER, payload);
+    await axiosInstance.post(ApiConstant.CREATE_INDEXER, payload);
   } catch (error) {
     console.error("Error creating indexer:", error);
     throw error;
@@ -154,7 +180,7 @@ export const getIndexerDetails = async (
   indexerId: number
 ): Promise<IndexerResponse | undefined> => {
   try {
-    const apiUrl = StringFormat(GET_INDEXER_DETAIL, { indexerId });
+    const apiUrl = StringFormat(ApiConstant.GET_INDEXER_DETAIL, { indexerId });
 
     const response: AxiosResponse<BaseResponseData<IndexerResponse>> =
       await axiosInstance.get(apiUrl);
@@ -175,7 +201,7 @@ export const getTablesInIndexer = async (
   indexerId: number
 ): Promise<IndexerTableMetadata[] | undefined> => {
   try {
-    const apiUrl = StringFormat(GET_TABLES_INDEXER, { indexerId });
+    const apiUrl = StringFormat(ApiConstant.GET_TABLES_INDEXER, { indexerId });
 
     const response: AxiosResponse<BaseResponseData<IndexerTableMetadata[]>> =
       await axiosInstance.get(apiUrl);
@@ -197,7 +223,7 @@ export const getTriggersAndTransformers = async (
   tableId: number
 ): Promise<TriggerAndTransformer[] | undefined> => {
   try {
-    const apiUrl = StringFormat(GET_TRIGGER_TRANSFORMER, {
+    const apiUrl = StringFormat(ApiConstant.GET_TRIGGER_TRANSFORMER, {
       indexerId,
       tableId,
     });
@@ -221,7 +247,7 @@ export const createTable = async (
   payload: CreateTablePayload
 ): Promise<void> => {
   try {
-    const apiUrl = StringFormat(CREATE_TABLE, {
+    const apiUrl = StringFormat(ApiConstant.CREATE_TABLE, {
       indexerId: payload.indexerId,
     });
 
@@ -244,7 +270,7 @@ export const createTriggerAndTransformer = async (
     const blob = new Blob([payload.transformCode], { type: "text/javascript" });
     formData.append("transformer", blob, "transform.js");
 
-    const apiUrl = StringFormat(CREATE_TRIGGER_TRANSFORMER, {
+    const apiUrl = StringFormat(ApiConstant.CREATE_TRIGGER_TRANSFORMER, {
       indexerId: payload.indexerId,
     });
 
@@ -263,7 +289,7 @@ export const updateTransformerScript = async (
   payload: UpdateTransformerScriptPayload
 ): Promise<void> => {
   try {
-    const apiUrl = StringFormat(UPDATE_TRANSFORMER, {
+    const apiUrl = StringFormat(ApiConstant.UPDATE_TRANSFORMER, {
       indexerId: payload.indexerId,
     });
 
@@ -282,7 +308,7 @@ export const executeQuery = async (
 ): Promise<ExecuteQueryResponse | undefined> => {
   try {
     const response: AxiosResponse<BaseResponseData<ExecuteQueryResponse>> =
-      await axiosInstance.post(EXECUTE_QUERY, { query });
+      await axiosInstance.post(ApiConstant.EXECUTE_QUERY, { query });
 
     const responseData = CommonUtils.getDappServicesResponseData(response);
 
@@ -301,7 +327,7 @@ export const getAllQueryLog = async (
   indexerId: number
 ): Promise<QueryLogResponse[] | undefined> => {
   try {
-    const apiUrl = StringFormat(GET_QUERY_LOG, { indexerId });
+    const apiUrl = StringFormat(ApiConstant.GET_QUERY_LOG, { indexerId });
 
     const response: AxiosResponse<BaseResponseData<QueryLogResponse[]>> =
       await axiosInstance.get(apiUrl);
@@ -321,7 +347,7 @@ export const createQueryLog = async (
   payload: CreateQueryLogPayload
 ): Promise<void> => {
   try {
-    const apiUrl = StringFormat(CREATE_QUERY_LOG, {
+    const apiUrl = StringFormat(ApiConstant.CREATE_QUERY_LOG, {
       indexerId: payload.indexerId,
     });
 
