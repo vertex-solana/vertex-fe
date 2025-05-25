@@ -1,13 +1,9 @@
 "use client";
 
-import React, { useContext } from "react";
-
-import { AppConstant } from "@/const";
+import React, { useContext, useState } from "react";
 import { AuthContextInterface } from "@/models/context.model";
-
 import useAuthHook from "@/hooks/auth-hooks";
 
-import Cookies from "js-cookie";
 
 const INITIAL_STATE = {} as AuthContextInterface;
 
@@ -16,11 +12,27 @@ const AuthContext = React.createContext(INITIAL_STATE);
 export const useAuthContext = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const token = Cookies.get(AppConstant.KEY_TOKEN);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [walletConnect, setWalletConnect] = useState<string | null>(null);
 
-  const { handleLogout } = useAuthHook();
+  const { handleLogout, handleLoginWallet } = useAuthHook();
 
-  return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+
+        walletConnect,
+        setWalletConnect,
+
+        handleLoginWallet,
+        handleLogout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 interface AuthProviderProps {

@@ -16,6 +16,16 @@ export enum SolanaWalletsEnum {
   Solflare = "Solflare",
 }
 
+export interface GetNonceResponse {
+  walletAddress: string;
+  nonce: string;
+}
+
+export interface PostLoginResponse {
+  accessToken: string;
+  refreshToken?: string;
+}
+
 export interface IndexerResponse {
   id: number;
   name: string;
@@ -85,4 +95,9 @@ export interface QueryLogResponse {
 export enum IndexerTypeEnum {
   All = "All",
   Owner = "Owner",
+}
+
+export interface LoginWalletDataInterface {
+  walletAddress: string;
+  walletType: SolanaWalletsEnum
 }

@@ -16,6 +16,13 @@ export const STT_INTERNAL_SERVER = 500;
 export const STT_NOT_MODIFIED = 304;
 
 // API Path
+
+// Authentication
+export const AUTH = '/auth'
+export const GET_NONCE = `${AUTH}/wallet/{walletAddress}/nonce`;
+export const POST_LOGIN = `${AUTH}/login`;
+export const POST_LOGOUT = `${AUTH}/logout`;
+
 export const GET_ACCOUNT = `/accounts/{accountId}`;
 export const UPDATE_USERNAME = "accounts/update-user-name";
 

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,7 +18,8 @@ import Image from "next/image";
 import { ImageAssets } from "public";
 import { DropdownContent, DropdownRoot, DropdownTrigger } from "../common";
 import { ArrowIcon, LogoutIcon } from "../icons";
-import { useAppContext } from "@/context";
+import { useAppContext, useAuthContext } from "@/context";
+import WalletConnect from "./main-layout/WalletConnect";
 
 type NavItem = {
   label: string;
@@ -32,31 +33,15 @@ const navigationIndexer: NavItem[] = [
 ];
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
+
   const { handleGetUserInfo } = useAppHooks();
   const { userInfo, setIndexer, setUserInfo } = useAppContext();
+  const { handleLogout, isLoggedIn, setIsLoggedIn } = useAuthContext();
+
   const router = useRouter();
 
   const pathName = usePathname();
-
-  useEffect(() => {
-    const token = Cookies.get("token");
-    setIsLoggedIn(!!token);
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get("accessToken");
-    if (accessToken) {
-      Cookies.set("token", accessToken, { expires: 7 });
-      setIsLoggedIn(true);
-
-      urlParams.delete("accessToken");
-      const newUrl = `${window.location.origin}${window.location.pathname}${
-        urlParams.toString() ? `?${urlParams.toString()}` : ""
-      }`;
-      window.history.replaceState({}, document.title, newUrl);
-    }
-  }, []);
 
   useEffect(() => {
     const fetchUserInfo = async (token: string) => {
@@ -76,14 +61,10 @@ export default function Header() {
     }
   }, [isLoggedIn]);
 
-  const handleSignIn = () => {
-    window.location.href = `${process.env.SERVICE_URL}/auth/google/login`;
-  };
-
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     setUserInfo(null);
     setIndexer(null);
-    Cookies.remove("token");
+    await handleLogout();
     setIsLoggedIn(false);
     router.push("/");
   };
@@ -132,7 +113,7 @@ export default function Header() {
           </div>
 
           <div className="hidden md:flex items-center space-x-4 ">
-            {isLoggedIn ? (
+            {isLoggedIn && userInfo ? (
               <DropdownRoot
                 open={isOpenDropdown}
                 onOpenChange={() => setIsOpenDropdown(!isOpenDropdown)}
@@ -144,7 +125,12 @@ export default function Header() {
                       alt="default user image"
                       className="rounded-full w-7 h-7"
                     />
-                    <p>{userInfo?.userName}</p>
+                    <p>
+                      {`${userInfo.walletAddress.slice(
+                        0,
+                        6
+                      )}...${userInfo.walletAddress.slice(-5)}`}
+                    </p>
                     <ArrowIcon
                       className={twJoin(
                         "text-neutral1",
@@ -162,6 +148,10 @@ export default function Header() {
                   align="center"
                 >
                   <div className="flex flex-col gap-y-3 py-3 px-4 border-b-[0.5px] border-neutral5">
+                    <p>{`Address: ${userInfo.walletAddress.slice(
+                      0,
+                      6
+                    )}...${userInfo.walletAddress.slice(-5)}`}</p>
                     <p>{`Name: ${userInfo?.userName}`}</p>
                     <p>{`Email: ${userInfo?.email}`}</p>
                   </div>
@@ -169,14 +159,12 @@ export default function Header() {
                     className="text-error2 p-3 w-full flex items-center gap-x-2 justify-center"
                     onClick={handleSignOut}
                   >
-                    Sign Out <LogoutIcon className="w-5 h-5" />
+                    Disconnect <LogoutIcon className="w-5 h-5" />
                   </button>
                 </DropdownContent>
               </DropdownRoot>
             ) : (
-              <Button size="lg" className="group" onClick={handleSignIn}>
-                Sign In with Google
-              </Button>
+              <WalletConnect />
             )}
           </div>
 
