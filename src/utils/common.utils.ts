@@ -3,6 +3,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BaseResponseData, ResponseDataList } from "@/models/common.model";
 import { AxiosResponse } from "axios";
+import Cookies from "js-cookie";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -226,4 +227,27 @@ export const getDappServicesResponseListData = <T>(
   } else {
     return undefined;
   }
+};
+
+export const getProvider = () => {
+  const provider = "solana-provider";
+
+  return {
+    keyProvider: provider,
+    provider: localStorage.getItem(provider),
+  };
+};
+
+export const getAccessToken = () => {
+  return {
+    keyToken: "token",
+    accessToken: Cookies.get("token"),
+  };
+};
+
+export const getStorageAddress = () => {
+  return {
+    keyAddress: "sol_wallet_address",
+    storageWalletAddress: localStorage.getItem("sol_wallet_address"),
+  };
 };

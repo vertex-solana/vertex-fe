@@ -1,18 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/ui/button";
 import { useWallet, Wallet } from "@solana/wallet-adapter-react";
+import { useAuthContext } from "@/context";
+import { SolanaWalletsEnum } from "@/models";
 
 const WalletConnect = () => {
   const { wallets, select } = useWallet();
 
+  const { handleLoginWallet, setWalletConnect, setIsLoggedIn } =
+    useAuthContext();
+
   const [isOpen, setIsOpen] = useState(false);
 
   const handleConnect = async (wallet: Wallet) => {
-    select(wallet.adapter.name);
+    try {
+      select(wallet.adapter.name);
+      setIsOpen(false);
 
-    await wallet.adapter.connect();
+      await handleLoginWallet({
+        walletAddress: wallet.adapter.publicKey!.toBase58(),
+        walletType: wallet.adapter.name as SolanaWalletsEnum,
+      });
+
+      setWalletConnect(wallet.adapter.publicKey!.toBase58());
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -28,11 +44,7 @@ const WalletConnect = () => {
       >
         <div className="flex flex-col gap-y-4">
           {wallets
-            .filter(
-              (item) =>
-                item?.readyState === "Installed" ||
-                item?.adapter?.name === "Ledger"
-            )
+            .filter((item) => item?.readyState === "Installed")
             .map((wallet, index) => (
               <WalletItem
                 key={index}

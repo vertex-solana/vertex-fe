@@ -5,8 +5,8 @@ import {
   WalletProvider,
   ConnectionProvider,
 } from "@solana/wallet-adapter-react";
+
 import { BlockChainUtils } from "@/utils";
-import { LedgerWalletAdapter } from "@solana/wallet-adapter-wallets";
 
 const SolanaProvider = ({ children }: PropsWithChildren) => {
   const endpoint = BlockChainUtils.getSolanaRpcEndpoint();
