@@ -32,6 +32,8 @@ const ViewIdlAccount: FC<ViewIdlAccountProps> = ({ idl }) => {
     const showType = (type: IdlTypeV30) => {
       if (typeof type === "object" && "array" in type) {
         return `[${type.array[0]}; ${type.array[1]}]`;
+      } else if (typeof type === "object" && "vec" in type) {
+        return `Vec<${(type.vec as any).defined.name}>`;
       } else {
         return type.toString();
       }
