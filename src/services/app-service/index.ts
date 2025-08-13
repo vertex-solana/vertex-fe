@@ -304,11 +304,12 @@ export const updateTransformerScript = async (
 };
 
 export const executeQuery = async (
-  query: string
+  query: string,
+  indexerId: number
 ): Promise<ExecuteQueryResponse | undefined> => {
   try {
     const response: AxiosResponse<BaseResponseData<ExecuteQueryResponse>> =
-      await axiosInstance.post(ApiConstant.EXECUTE_QUERY, { query });
+      await axiosInstance.post(ApiConstant.EXECUTE_QUERY, { query, indexerId });
 
     const responseData = CommonUtils.getDappServicesResponseData(response);
 

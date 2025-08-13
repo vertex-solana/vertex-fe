@@ -35,7 +35,7 @@ const EditorPanel = () => {
   const executeQuery = async () => {
     setIsLoading(true);
     try {
-      const response = await handleExecuteQuery(query);
+      const response = await handleExecuteQuery(query, indexer!.id);
       setResult(response ?? null);
     } catch (error) {
       console.error("Error executing query:", error);
