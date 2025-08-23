@@ -131,8 +131,8 @@ const useAppHooks = () => {
     return await updateTransformerScript(payload);
   };
 
-  const handleExecuteQuery = async (query: string) => {
-    return await executeQuery(query);
+  const handleExecuteQuery = async (query: string, indexerId: number) => {
+    return await executeQuery(query, indexerId);
   };
 
   const handleGetAllQueryLogs = async (indexerId: number) => {

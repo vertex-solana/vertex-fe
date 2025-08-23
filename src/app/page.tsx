@@ -182,7 +182,7 @@ const Home = () => {
                       </p>
 
                       <p className="text-primary5 text-start truncate">
-                        {indexer.owner.userName}
+                        {indexer.owner.walletAddress}
                       </p>
                     </div>
                   ))}
