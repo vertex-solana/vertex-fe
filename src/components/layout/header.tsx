@@ -37,7 +37,8 @@ export default function Header() {
 
   const { handleGetUserInfo } = useAppHooks();
   const { userInfo, setIndexer, setUserInfo } = useAppContext();
-  const { handleLogout, isLoggedIn, setIsLoggedIn, setWalletConnect } = useAuthContext();
+  const { handleLogout, isLoggedIn, setIsLoggedIn, setWalletConnect } =
+    useAuthContext();
 
   const router = useRouter();
 
@@ -153,7 +154,6 @@ export default function Header() {
                       0,
                       6
                     )}...${userInfo.walletAddress.slice(-5)}`}</p>
-                    <p>{`Name: ${userInfo?.userName}`}</p>
                     <p>{`Email: ${userInfo?.email}`}</p>
                   </div>
                   <button

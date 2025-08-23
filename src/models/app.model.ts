@@ -4,9 +4,7 @@ import { Idl as IdlV30 } from "anchor-v30";
 export interface UserInfoInterface {
   id: number;
   email: string;
-  userName: string;
   walletAddress: string;
-  isUpdatedUserName: boolean;
   createdAt: Date;
 }
 
@@ -34,6 +32,7 @@ export interface IndexerResponse {
   slug: string;
   cluster: string;
   ownerAccountId: number;
+  schemaPath: string;
   owner: UserInfoInterface;
 }
 
@@ -99,5 +98,5 @@ export enum IndexerTypeEnum {
 
 export interface LoginWalletDataInterface {
   walletAddress: string;
-  walletType: SolanaWalletsEnum
+  walletType: SolanaWalletsEnum;
 }

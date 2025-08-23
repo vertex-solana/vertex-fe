@@ -8,13 +8,14 @@ import { isNil } from "lodash";
 import DataViewManager from "./DataViewmanager";
 import { useAppContext } from "@/context";
 import { useAppHooks } from "@/hooks";
+import { toast } from "react-hot-toast";
 
 const EditorPanel = () => {
   const { indexer } = useAppContext();
   const { handleExecuteQuery, handleGetAllQueryLogs } = useAppHooks();
 
   const [query, setQuery] = useState<string>(
-    "SELECT * FROM table_name LIMIT 10"
+    `SELECT * FROM ${indexer?.schemaPath}."table_name" LIMIT 10`
   );
   const [queryLog, setQueryLog] = useState<QueryLogResponse[]>([]);
   const [result, setResult] = useState<ExecuteQueryResponse | null>(null);
@@ -35,10 +36,10 @@ const EditorPanel = () => {
   const executeQuery = async () => {
     setIsLoading(true);
     try {
-      const response = await handleExecuteQuery(query);
+      const response = await handleExecuteQuery(query, Number(indexer!.id));
       setResult(response ?? null);
     } catch (error) {
-      console.error("Error executing query:", error);
+      toast.error((error as any).response.data.message);
     } finally {
       setIsLoading(false);
     }
