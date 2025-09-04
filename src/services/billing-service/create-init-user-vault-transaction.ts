@@ -1,5 +1,4 @@
-import { SolanaWalletsEnum } from "@/models";
-import { BlockChainUtils, CommonUtils } from "@/utils";
+import { BlockChainUtils } from "@/utils";
 import {
   Connection,
   PublicKey,
@@ -20,32 +19,19 @@ export const createInitUserVaultTransaction = async (
 
   if (!walletAddress) throw new Error("Wallet address is required");
 
+  const walletPubkey = new PublicKey(walletAddress);
   const rpcEndpoint = BlockChainUtils.getSolanaRpcEndpoint();
   const connection = new Connection(rpcEndpoint);
-
-  const currentWalletProvider = CommonUtils.getProvider()
-    .provider as SolanaWalletsEnum;
-  const provider = BlockChainUtils.getSolanaWalletsProvider(
-    currentWalletProvider
-  );
-
-  if (isNil(provider)) {
-    throw new Error("Wallet provider is required");
-  }
-
-  if (isNil(provider.publicKey)) {
-    await provider.connect();
-  }
 
   const program = getProgram(connection);
   const tx = new Transaction();
   const userVault = PublicKey.findProgramAddressSync(
-    seeds.userVault(provider.publicKey!),
+    seeds.userVault(walletPubkey),
     program.programId
   )[0];
   const ix = await initUserVaultIx(connection, {
     accounts: {
-      owner: provider.publicKey!,
+      owner: walletPubkey,
       userVault,
       systemProgram: SystemProgram.programId,
     },

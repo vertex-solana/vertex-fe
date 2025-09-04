@@ -16,20 +16,22 @@ import useTransaction from "@/hooks/blockchain-hooks";
 const WalletConnect = () => {
   const { wallets, select, publicKey, wallet } = useWallet();
 
-  const { handleLoginWallet, setWalletConnect, setIsLoggedIn, isLoggedIn } =
-    useAuthContext();
+  const {
+    handleLoginWallet,
+    setWalletConnect,
+    setIsLoggedIn,
+    isLoggedIn,
+    walletConnect,
+  } = useAuthContext();
   const { connection, vertexProgram } = useAppContext();
   const {
     handleInitUserVault,
     transactionHash,
     transactionStatus,
-    handleReset,
-    transactionError,
     setTransactionHash,
     setTransactionStatus,
+    handleReset,
   } = useInitUserVaultHooks();
-  console.log("🚀 ~ WalletConnect ~ transactionStatus:", transactionStatus);
-  console.log("🚀 ~ WalletConnect ~ transactionHash:", transactionHash);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isToastOpen, setIsToastOpen] = useState(false);
@@ -39,36 +41,40 @@ const WalletConnect = () => {
     setIsOpen(false);
   };
 
+  // TODO: Fix bug not update state to display transaction toast
+  const handleStartInitUserVault = async () => {
+    if (walletConnect) {
+      const userVault = PublicKey.findProgramAddressSync(
+        seeds.userVault(new PublicKey(walletConnect)),
+        vertexProgram.programId
+      )[0];
+
+      const userVaultInfo = await connection.getAccountInfo(userVault);
+      if (isNil(userVaultInfo)) {
+        setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
+        const txHash = await handleInitUserVault({
+          walletAddress: new PublicKey(walletConnect),
+        });
+        setTransactionHash(txHash!);
+        setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
+      }
+    }
+  };
+
   useEffect(() => {
     const login = async () => {
       if (!publicKey || !wallet || isLoggedIn) return;
 
       try {
         const address = publicKey.toBase58();
+        setWalletConnect(address);
 
         await handleLoginWallet({
           walletAddress: address,
           walletType: wallet.adapter.name as SolanaWalletsEnum,
         });
 
-        setWalletConnect(address);
         setIsLoggedIn(true);
-
-        const userVault = PublicKey.findProgramAddressSync(
-          seeds.userVault(new PublicKey(address)),
-          vertexProgram.programId
-        )[0];
-
-        const userVaultInfo = await connection.getAccountInfo(userVault);
-        // if (isNil(userVaultInfo)) {
-        setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
-        const txHash = await handleInitUserVault({
-          walletAddress: new PublicKey(address),
-        });
-        console.log("🚀 ~ login ~ txHash:", txHash);
-        setTransactionHash(txHash!);
-        setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
-        // }
       } catch (error) {
         console.error("Login error:", error);
       }
@@ -76,6 +82,10 @@ const WalletConnect = () => {
 
     login();
   }, [publicKey, wallet]);
+
+  useEffect(() => {
+    handleStartInitUserVault();
+  }, [walletConnect]);
 
   useEffect(() => {
     console.log(transactionHash, transactionStatus);
@@ -119,7 +129,7 @@ const WalletConnect = () => {
         ReactDOM.createPortal(
           <CommonTransactionToast
             status={transactionStatus}
-            transactionHash={transactionHash}
+            transactionHash={transactionHash!}
             onReset={handleReset}
           />,
           document.body

@@ -4,7 +4,7 @@ import { web3 } from "@project-serum/anchor";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { BlockchainService } from "@/services";
 
-import { retry, wait } from "@/utils/common.utils";
+import { retry } from "@/utils/common.utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Connection,
@@ -30,17 +30,9 @@ const useTransaction = () => {
 
   const handleSendTransaction = async (data: web3.Transaction) => {
     try {
-      console.log("go in here");
       let resTransaction = { txHash: "", messageError: "" };
 
-      await wait(3000);
-      // resTransaction = await handleSendSolanaTransaction(data);
-      // @ts-ignore
-      resTransaction = {
-        txHash: "19042094234093284032",
-        // messageError: "",
-      };
-
+      resTransaction = await handleSendSolanaTransaction(data);
       if (resTransaction.messageError) {
         if (
           !resTransaction.messageError
