@@ -4,7 +4,7 @@ import { web3 } from "@project-serum/anchor";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { BlockchainService } from "@/services";
 
-import { retry } from "@/utils/common.utils";
+import { retry, wait } from "@/utils/common.utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Connection,
@@ -30,21 +30,22 @@ const useTransaction = () => {
 
   const handleSendTransaction = async (data: web3.Transaction) => {
     try {
-      let resTransaction = { txHash: "", messageError: "" };
+      let resTransaction = { txHash: "ajsahdjsahdasjd", messageError: "" };
 
-      resTransaction = await handleSendSolanaTransaction(data);
-      if (resTransaction.messageError) {
-        if (
-          !resTransaction.messageError
-            .toLowerCase()
-            .includes(AppConstant.USER_REJECTED_MESSAGE.toLowerCase())
-        ) {
-          setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
-          setTransactionError(resTransaction.messageError);
-        } else {
-          setTransactionStatus(null);
-        }
-      }
+      // resTransaction = await handleSendSolanaTransaction(data);
+      // if (resTransaction.messageError) {
+      //   if (
+      //     !resTransaction.messageError
+      //       .toLowerCase()
+      //       .includes(AppConstant.USER_REJECTED_MESSAGE.toLowerCase())
+      //   ) {
+      //     setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
+      //     setTransactionError(resTransaction.messageError);
+      //   } else {
+      //     setTransactionStatus(null);
+      //   }
+      // }
+      await wait(3000)
 
       return resTransaction.txHash;
     } catch (error: any) {
