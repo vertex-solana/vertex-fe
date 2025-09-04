@@ -109,3 +109,8 @@ export interface LoginWalletDataInterface {
   walletAddress: string;
   walletType: SolanaWalletsEnum;
 }
+
+export enum ExecutionLayer {
+  BASE_CHAIN = 'BASE_CHAIN',
+  EPHEMERAL_ROLLUP = 'EPHEMERAL_ROLLUP',
+}

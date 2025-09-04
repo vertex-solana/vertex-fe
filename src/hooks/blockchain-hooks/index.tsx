@@ -30,22 +30,21 @@ const useTransaction = () => {
 
   const handleSendTransaction = async (data: web3.Transaction) => {
     try {
-      let resTransaction = { txHash: "ajsahdjsahdasjd", messageError: "" };
+      let resTransaction = { txHash: "", messageError: "" };
 
-      // resTransaction = await handleSendSolanaTransaction(data);
-      // if (resTransaction.messageError) {
-      //   if (
-      //     !resTransaction.messageError
-      //       .toLowerCase()
-      //       .includes(AppConstant.USER_REJECTED_MESSAGE.toLowerCase())
-      //   ) {
-      //     setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
-      //     setTransactionError(resTransaction.messageError);
-      //   } else {
-      //     setTransactionStatus(null);
-      //   }
-      // }
-      await wait(3000)
+      resTransaction = await handleSendSolanaTransaction(data);
+      if (resTransaction.messageError) {
+        if (
+          !resTransaction.messageError
+            .toLowerCase()
+            .includes(AppConstant.USER_REJECTED_MESSAGE.toLowerCase())
+        ) {
+          setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
+          setTransactionError(resTransaction.messageError);
+        } else {
+          setTransactionStatus(null);
+        }
+      }
 
       return resTransaction.txHash;
     } catch (error: any) {

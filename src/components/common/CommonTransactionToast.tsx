@@ -32,17 +32,17 @@ const CommonTransactionToast: React.FC<CommonTransactionToastProps> = ({
   const { title, icon } = useMemo(() => {
     if (status === BlockchainTransactionStatusEnum.SUCCESS) {
       return {
-        title: getLabel("lTransactionSucceeded"),
+        title: "Transaction succeeded",
         icon: <CheckRoundedIcon className="text-success1" />,
       };
     } else if (status === BlockchainTransactionStatusEnum.FAILED) {
       return {
-        title: getLabel("lTransactionFailed"),
+        title: "Transaction failed",
         icon: <CloseCircleIcon className="text-error2" />,
       };
     } else {
       return {
-        title: getLabel("lTransactionSent"),
+        title: "Transaction sent",
         icon: <ExchangeIcon className="text-neutral1" />,
       };
     }
@@ -92,7 +92,7 @@ const CommonTransactionToast: React.FC<CommonTransactionToastProps> = ({
             href={CommonUtils.getTransactionHashInfoLink(transactionHash || "")}
             target="_blank"
           >
-            {getLabel("lViewYourTransaction")}
+            View your transaction
             <ExternalLinkIcon />
           </a>
         ) : (

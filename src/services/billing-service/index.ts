@@ -1,4 +1,8 @@
 import {
+  createInitIndexerTransaction,
+  CreateInitIndexerTransactionParams,
+} from "./create-init-indexer-transaction";
+import {
   createInitUserVaultTransaction,
   CreateInitUserVaultTransactionParams,
 } from "./create-init-user-vault-transaction";
@@ -16,6 +20,12 @@ export class BillingService implements BillingServiceInterface {
     params: CreateInitUserVaultTransactionParams
   ): Promise<ResTransactionType> {
     return this.createTransaction(createInitUserVaultTransaction, params);
+  }
+
+  createInitIndexerTransaction(
+    params: CreateInitIndexerTransactionParams
+  ): Promise<ResTransactionType> {
+    return this.createTransaction(createInitIndexerTransaction, params);
   }
 }
 

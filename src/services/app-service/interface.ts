@@ -1,3 +1,5 @@
+import { ExecutionLayer } from "@/models/app.model";
+
 export interface GetAllIndexersParams {
   pageNum?: number;
   pageSize?: number;
@@ -52,4 +54,9 @@ export interface CreateQueryLogPayload {
   indexerId: number;
   description: string;
   query: string;
+}
+
+export interface SubmitVertexBillingTransactionPayload {
+  txHash: string;
+  executionLayer: ExecutionLayer;
 }

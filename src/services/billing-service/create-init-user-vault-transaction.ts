@@ -5,7 +5,6 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
-import { isNil } from "lodash";
 import { getProgram, initUserVaultIx, seeds } from "./sdk";
 
 export interface CreateInitUserVaultTransactionParams {

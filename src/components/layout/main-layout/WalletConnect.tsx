@@ -4,17 +4,23 @@ import { Modal } from "@/components/ui/Modal";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/ui/button";
 import { useWallet, Wallet } from "@solana/wallet-adapter-react";
-import { useAuthContext } from "@/context";
+import { useAppContext, useAuthContext } from "@/context";
 import { BlockchainTransactionStatusEnum, SolanaWalletsEnum } from "@/models";
 import { PublicKey } from "@solana/web3.js";
 import useInitUserVaultHooks from "@/hooks/billing-hooks/useInitUserVaultHooks";
 import { CommonTransactionToast } from "@/components/common";
+import { seeds } from "@/services/billing-service/sdk";
+import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
+import { ExecutionLayer } from "@/models/app.model";
 
 const WalletConnect = () => {
   const { wallets, select, publicKey, wallet } = useWallet();
 
   const { handleLoginWallet, setWalletConnect, setIsLoggedIn, isLoggedIn } =
     useAuthContext();
+  const { connection, vertexProgram } = useAppContext();
+  const { handleSubmitVertexBillingTransaction } = useAppHooks();
   const {
     handleInitUserVault,
     transactionHash,
@@ -45,29 +51,41 @@ const WalletConnect = () => {
 
       const address = publicKey.toBase58();
 
-      handleLoginWallet({
+      await handleLoginWallet({
         walletAddress: address,
         walletType: wallet.adapter.name as SolanaWalletsEnum,
       }).catch((err) => console.error("Login error:", err));
 
       setWalletConnect(address);
 
-      await handleStartInitUserVaultSafe(address);
+      await handleStartInitUserVaultSafe(new PublicKey(address));
       if (isMounted.current) setIsLoggedIn(true);
     };
 
     login();
   }, [publicKey, wallet]);
 
-  const handleStartInitUserVaultSafe = async (addr: string) => {
+  const handleStartInitUserVaultSafe = async (walletAddress: PublicKey) => {
     try {
-      setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
-      const txHash = await handleInitUserVault({
-        walletAddress: new PublicKey(addr),
-      });
-      if (!isMounted.current) return;
-      setTransactionHash(txHash!);
-      setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
+      const userVault = PublicKey.findProgramAddressSync(
+        seeds.userVault(walletAddress),
+        vertexProgram.programId
+      )[0];
+      const userVaultData = await connection.getAccountInfo(userVault);
+      if (isNil(userVaultData)) {
+        setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
+        const txHash = await handleInitUserVault({
+          walletAddress,
+        });
+        if (!isMounted.current) return;
+        setTransactionHash(txHash!);
+        setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
+
+        await handleSubmitVertexBillingTransaction({
+          executionLayer: ExecutionLayer.BASE_CHAIN,
+          txHash: txHash!,
+        });
+      }
     } catch (e) {
       if (!isMounted.current) return;
       setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);

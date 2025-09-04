@@ -18,7 +18,7 @@ export const STT_NOT_MODIFIED = 304;
 // API Path
 
 // Authentication
-export const AUTH = '/auth'
+export const AUTH = "/auth";
 export const GET_NONCE = `${AUTH}/wallet/{walletAddress}/nonce`;
 export const POST_LOGIN = `${AUTH}/login`;
 export const POST_LOGOUT = `${AUTH}/logout`;
@@ -47,3 +47,5 @@ export const UPDATE_TRANSFORMER = `${GET_INDEXERS}/{indexerId}/transformers`;
 export const GET_QUERY_LOG = `${GET_INDEXERS}/{indexerId}/query`;
 export const EXECUTE_QUERY = `${GET_INDEXERS}/query`;
 export const CREATE_QUERY_LOG = `${GET_INDEXERS}/{indexerId}/query`;
+
+export const SUBMIT_VERTEX_BILLING_TRANSACTION = `/billing/sync-transaction`;
