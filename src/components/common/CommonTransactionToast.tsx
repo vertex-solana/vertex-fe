@@ -109,7 +109,7 @@ export default CommonTransactionToast;
 
 interface CommonTransactionToastProps
   extends React.ComponentPropsWithoutRef<"div"> {
-  status?: BlockchainTransactionStatusEnum;
+  status: BlockchainTransactionStatusEnum | null;
 
   transactionHash?: string;
   contentClassName?: string;

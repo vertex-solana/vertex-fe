@@ -1,8 +1,14 @@
 import { UserInfoInterface } from ".";
 import { Dispatch, SetStateAction } from "react";
 import { IndexerResponse, LoginWalletDataInterface } from "./app.model";
+import { Connection } from "@solana/web3.js";
+import { Program } from "anchor-v31";
+import { VertexProgram } from "@/services/billing-service/sdk/idl/vertex_program";
 
 interface AppContextProps {
+  connection: Connection;
+  vertexProgram: Program<VertexProgram>;
+
   userInfo: UserInfoInterface | null;
   setUserInfo: Dispatch<SetStateAction<UserInfoInterface | null>>;
 
@@ -22,7 +28,7 @@ interface AuthContextInterface {
 
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
-  
+
   handleLoginWallet: (input: LoginWalletDataInterface) => Promise<string>;
   handleLogout: () => Promise<void>;
 }

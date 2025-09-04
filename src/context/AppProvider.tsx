@@ -12,6 +12,9 @@ import { UserInfoInterface } from "@/models";
 
 import { AppContextProps } from "@/models/context.model";
 import { IndexerResponse } from "@/models/app.model";
+import { Connection } from "@solana/web3.js";
+import { BlockChainUtils } from "@/utils";
+import { getProgram } from "@/services/billing-service/sdk";
 
 const INITIAL_STATE = {} as AppContextProps;
 
@@ -27,9 +30,15 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserInfoInterface | null>(null);
   const [indexer, setIndexer] = useState<IndexerResponse | null>(null);
 
+  const connection = new Connection(BlockChainUtils.getSolanaRpcEndpoint());
+  const vertexProgram = getProgram(connection);
+
   return (
     <AppContext.Provider
       value={{
+        connection,
+        vertexProgram,
+
         userInfo: userInfo,
         setUserInfo: setUserInfo,
         indexer: indexer,

@@ -1,3 +1,5 @@
+import { ComponentType } from "react";
+
 export interface ObjectMultiLanguageProps {
   [x: string]: string;
 }
@@ -38,3 +40,5 @@ export enum SortOrderEnum {
   ASC = "ASC",
   DESC = "DESC",
 }
+
+export type HOCControllerInterface = ComponentType<any>;
