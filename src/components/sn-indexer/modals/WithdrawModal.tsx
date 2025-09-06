@@ -112,10 +112,9 @@ const WithdrawModal: FC<WithdrawModalProps> = ({
       if (status === BlockchainTransactionStatusEnum.SUCCESS) {
         console.log("Transaction confirmed! Refreshing vault balance...");
 
+        // Trigger global vault balance refresh
         localStorage.setItem("vaultBalanceRefresh", Date.now().toString());
-
         window.dispatchEvent(new CustomEvent("vaultBalanceRefresh"));
-
         setIsTransactionSuccess(true);
       } else {
         throw new Error("Transaction failed");

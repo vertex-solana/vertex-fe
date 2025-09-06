@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, Eye } from "lucide-react";
 import TablesAndTriggersView from "@/components/sn-indexer/TablesAndTriggersView";
@@ -23,7 +23,7 @@ const IndexerItem = () => {
 
   const { setIndexer, vertexProgram } = useAppContext();
   const { handleGetIndexerDetail } = useAppHooks();
-  const { getIndexerVaultBalance, indexerVaultBalance } =
+  const { getIndexerVaultBalance, indexerVaultBalance, refreshVaultBalance } =
     useVaultBalanceHooks();
 
   const [indexerPubkey, setIndexerPubkey] = useState<PublicKey | null>(null);
@@ -32,12 +32,12 @@ const IndexerItem = () => {
   const [isOwnerIndexer, setIsOwnerIndexer] = useState(false);
   const [hasLoadedVaultBalance, setHasLoadedVaultBalance] = useState(false);
 
-  const handleGetIndexerVaultBalance = async () => {
+  const handleGetIndexerVaultBalance = useCallback(async () => {
     if (indexerPubkey && !hasLoadedVaultBalance) {
       await getIndexerVaultBalance(indexerPubkey.toBase58());
       setHasLoadedVaultBalance(true);
     }
-  };
+  }, [indexerPubkey, hasLoadedVaultBalance, getIndexerVaultBalance]);
 
   useEffect(() => {
     const getIndexer = async () => {
@@ -147,8 +147,9 @@ const IndexerItem = () => {
           indexerId={indexerId}
           availableBalance={indexerVaultBalance}
           onWithdrawSuccess={() => {
-            setHasLoadedVaultBalance(false); // Reset to allow refresh
-            handleGetIndexerVaultBalance();
+            if (indexerPubkey) {
+              refreshVaultBalance(VaultType.INDEXER, indexerPubkey.toBase58());
+            }
           }}
         />
       )}

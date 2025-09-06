@@ -49,6 +49,7 @@ export default function Header() {
     walletConnect,
   } = useAuthContext();
   const [userVaultPubkey, setUserVaultPubkey] = useState<PublicKey>();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const router = useRouter();
 
@@ -73,7 +74,7 @@ export default function Header() {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    if (walletConnect) {
+    if (walletConnect && vertexProgram) {
       setUserVaultPubkey(
         PublicKey.findProgramAddressSync(
           seeds.userVault(new PublicKey(walletConnect)),
@@ -81,7 +82,30 @@ export default function Header() {
         )[0]
       );
     }
-  }, [walletConnect, isLoggedIn]);
+  }, [walletConnect, vertexProgram]);
+
+  useEffect(() => {
+    const handleVaultBalanceRefresh = () => {
+      setRefreshTrigger((prev) => prev + 1);
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "vaultBalanceRefresh") {
+        setRefreshTrigger((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("vaultBalanceRefresh", handleVaultBalanceRefresh);
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener(
+        "vaultBalanceRefresh",
+        handleVaultBalanceRefresh
+      );
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   const handleSignOut = async () => {
     setUserInfo(null);
@@ -142,6 +166,7 @@ export default function Header() {
                   variant={VaultType.USER}
                   showLabel={false}
                   vaultAddress={userVaultPubkey?.toBase58()}
+                  refreshTrigger={refreshTrigger}
                 />
                 <DropdownRoot
                   open={isOpenDropdown}

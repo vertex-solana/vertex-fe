@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   IdlDappResponse,
   IndexerResponse,
@@ -36,7 +36,9 @@ const Home = () => {
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
 
   const [userVaultPubkey, setUserVaultPubkey] = useState<PublicKey>();
-  const { getUserVaultBalance } = useVaultBalanceHooks();
+  const { getUserVaultBalance, refreshVaultBalance } = useVaultBalanceHooks();
+  const hasInitialized = useRef(false);
+  const hasFetchedIdlsForModal = useRef(false);
 
   const [selectedTypeIndexer, setSelectedTypeIndexer] = useState(
     IndexerTypeEnum.All
@@ -54,30 +56,24 @@ const Home = () => {
     setIndexers(filterIndexers || []);
   };
 
-  useEffect(() => {
-    const getIdls = async () => {
-      try {
-        // TODO: Handle Pagination
-        const response = await handleGetIdls({});
-        if (response) {
-          setIdls(response.pageData || []);
-        }
-      } catch (error) {
-        console.error("Error fetching Idl:", error);
-      }
-    };
-    getIdls();
-  }, [isOpenCreateModal]);
-
-  const handleGetIndexerData = async (
-    indexerType: IndexerTypeEnum,
-    pageNum: number,
-    pageSize: number
-  ) => {
+  const fetchIdls = useCallback(async () => {
     try {
-      if (isNil(userInfo)) {
-        setIndexers([]);
-      } else {
+      const response = await handleGetIdls({});
+      if (response) {
+        setIdls(response.pageData || []);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching IDLs:", error);
+    }
+  }, [handleGetIdls]);
+
+  const handleGetIndexerData = useCallback(
+    async (indexerType: IndexerTypeEnum, pageNum: number, pageSize: number) => {
+      try {
+        if (isNil(userInfo)) {
+          setIndexers([]);
+          return;
+        }
         let response;
 
         if (indexerType === IndexerTypeEnum.Owner) {
@@ -93,18 +89,54 @@ const Home = () => {
             totalItem: response.total || 0,
           });
         }
+      } catch (error) {
+        console.error("❌ Error fetching indexers:", error);
       }
-    } catch (error) {
-      console.error("Error fetching indexers:", error);
-    }
-  };
+    },
+    [userInfo, handleGetIndexersOwner, handleGetAllIndexers]
+  );
 
   useEffect(() => {
-    handleGetIndexerData(selectedTypeIndexer, 1, 5);
+    const initializeData = async () => {
+      if (!userInfo) {
+        hasInitialized.current = false;
+        return;
+      }
+
+      if (hasInitialized.current) {
+        return;
+      }
+
+      hasInitialized.current = true;
+
+      await Promise.all([
+        fetchIdls(),
+        handleGetIndexerData(selectedTypeIndexer, 1, 5),
+      ]);
+    };
+
+    initializeData();
   }, [selectedTypeIndexer, userInfo]);
 
   useEffect(() => {
-    if (walletConnect) {
+    if (userInfo && hasInitialized.current) {
+      handleGetIndexerData(selectedTypeIndexer, 1, 5);
+    }
+  }, [selectedTypeIndexer, userInfo]);
+
+  useEffect(() => {
+    if (isOpenCreateModal && userInfo) {
+      if (!hasFetchedIdlsForModal.current) {
+        hasFetchedIdlsForModal.current = true;
+        fetchIdls();
+      }
+    } else if (!isOpenCreateModal) {
+      hasFetchedIdlsForModal.current = false;
+    }
+  }, [isOpenCreateModal, userInfo]);
+
+  useEffect(() => {
+    if (walletConnect && vertexProgram) {
       setUserVaultPubkey(
         PublicKey.findProgramAddressSync(
           seeds.userVault(new PublicKey(walletConnect)),
@@ -112,13 +144,17 @@ const Home = () => {
         )[0]
       );
     }
-  }, [walletConnect]);
+  }, [walletConnect, vertexProgram]);
 
-  const handleGetUserVaultBalance = async () => {
+  const handleGetUserVaultBalance = useCallback(async () => {
     if (userVaultPubkey) {
-      await getUserVaultBalance(userVaultPubkey.toBase58());
+      refreshVaultBalance(VaultType.USER, userVaultPubkey.toBase58());
     }
-  };
+  }, [userVaultPubkey, refreshVaultBalance]);
+
+  const handleIndexerCreated = useCallback(async () => {
+    await handleGetIndexerData(selectedTypeIndexer, 1, 5);
+  }, [selectedTypeIndexer, handleGetIndexerData]);
 
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
@@ -265,6 +301,7 @@ const Home = () => {
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
+          onIndexerCreated={handleIndexerCreated}
         />
       )}
     </div>

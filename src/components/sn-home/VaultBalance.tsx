@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useState, useEffect, useRef } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import { twJoin } from "tailwind-merge";
 import { WalletIcon } from "@/components/icons";
 import { useAppContext } from "@/context";
@@ -30,107 +30,67 @@ const VaultBalance: FC<VaultBalanceProps> = ({
     indexerVaultBalance,
     userVaultBalance,
     isLoading: hookIsLoading,
+    refreshVaultBalance,
   } = useVaultBalanceHooks();
 
   const balance =
     variant === VaultType.USER ? userVaultBalance : indexerVaultBalance;
   const isLoading = hookIsLoading;
+  const hasInitialized = useRef(false);
 
-  // Add refs to prevent duplicate requests
-  const isRequestingRef = useRef(false);
-  const lastRequestTimeRef = useRef(0);
-  const requestTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const getVaultBalance = async () => {
+  useEffect(() => {
     if (!userInfo || !vaultAddress) {
       return;
     }
 
-    // Prevent duplicate requests
-    if (isRequestingRef.current) {
-      console.log("VaultBalance: Request already in progress, skipping...");
-      return;
-    }
-
-    // Throttle requests (max 1 per 2 seconds)
-    const now = Date.now();
-    if (now - lastRequestTimeRef.current < 2000) {
-      console.log("VaultBalance: Request throttled, skipping...");
-      return;
-    }
-
-    try {
-      isRequestingRef.current = true;
-      lastRequestTimeRef.current = now;
-
-      console.log(
-        `VaultBalance: Fetching ${variant} vault balance for address:`,
-        vaultAddress
-      );
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
 
       if (variant === VaultType.USER) {
-        await getUserVaultBalance(vaultAddress);
+        getUserVaultBalance(vaultAddress);
       } else if (variant === VaultType.INDEXER) {
-        await getIndexerVaultBalance(vaultAddress);
+        getIndexerVaultBalance(vaultAddress);
       }
-    } catch (error) {
-      console.error("Error fetching vault balance:", error);
-    } finally {
-      isRequestingRef.current = false;
     }
-  };
-
-  // Debounced version of getVaultBalance
-  const debouncedGetVaultBalance = () => {
-    if (requestTimeoutRef.current) {
-      clearTimeout(requestTimeoutRef.current);
-    }
-
-    requestTimeoutRef.current = setTimeout(() => {
-      getVaultBalance();
-    }, 300); // 300ms debounce
-  };
-
-  useEffect(() => {
-    if (userInfo && vaultAddress) {
-      debouncedGetVaultBalance();
-    }
-  }, []);
-
-  // Listen for refresh triggers
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "vaultBalanceRefresh" && userInfo && vaultAddress) {
-        debouncedGetVaultBalance();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    const handleCustomRefresh = () => {
-      if (userInfo && vaultAddress) {
-        console.log("VaultBalance: Refreshing due to custom event");
-        debouncedGetVaultBalance();
-      }
-    };
-
-    window.addEventListener("vaultBalanceRefresh", handleCustomRefresh);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("vaultBalanceRefresh", handleCustomRefresh);
-      if (requestTimeoutRef.current) {
-        clearTimeout(requestTimeoutRef.current);
-      }
-    };
-  }, [userInfo, vaultAddress]);
+  }, [
+    userInfo,
+    vaultAddress,
+    variant,
+    getUserVaultBalance,
+    getIndexerVaultBalance,
+  ]);
 
   useEffect(() => {
     if (refreshTrigger && refreshTrigger > 0 && userInfo && vaultAddress) {
-      console.log("VaultBalance: Refreshing due to refreshTrigger prop");
-      debouncedGetVaultBalance();
+      refreshVaultBalance(variant, vaultAddress);
     }
-  }, [refreshTrigger]);
+  }, [refreshTrigger, userInfo, vaultAddress, variant, refreshVaultBalance]);
+
+  useEffect(() => {
+    const handleGlobalRefresh = () => {
+      if (userInfo && vaultAddress) {
+        console.log(`🌐 VaultBalance: Global refresh triggered for ${variant}`);
+        refreshVaultBalance(variant, vaultAddress);
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "vaultBalanceRefresh" && userInfo && vaultAddress) {
+        console.log(
+          `💾 VaultBalance: Storage refresh triggered for ${variant}`
+        );
+        refreshVaultBalance(variant, vaultAddress);
+      }
+    };
+
+    window.addEventListener("vaultBalanceRefresh", handleGlobalRefresh);
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("vaultBalanceRefresh", handleGlobalRefresh);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [userInfo, vaultAddress, variant, refreshVaultBalance]);
 
   const formatBalance = (amount: number) => {
     return amount.toFixed(4);
