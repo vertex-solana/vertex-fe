@@ -114,3 +114,8 @@ export enum ExecutionLayer {
   BASE_CHAIN = 'BASE_CHAIN',
   EPHEMERAL_ROLLUP = 'EPHEMERAL_ROLLUP',
 }
+
+export enum VaultType {
+  USER = 'user',
+  INDEXER = 'indexer',
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ExchangeIcon,
   CloseCircleIcon,
@@ -67,36 +67,49 @@ const CommonTransactionToast: React.FC<CommonTransactionToastProps> = ({
         }
       }}
       toastTitle={
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-x-2 text-white">
           {icon} {title}
         </div>
       }
+      rootClassName="bg-[#1e2024] border border-neutral6 shadow-lg"
       {...otherProps}
     >
-      <div className={twMerge("flex flex-col gap-y-2", contentClassName)}>
-        {status === BlockchainTransactionStatusEnum.LOADING ? (
-          <span className="text-sm text-neutral4">
+      <div className={twMerge("flex flex-col gap-y-3", contentClassName)}>
+        {status === BlockchainTransactionStatusEnum.LOADING && (
+          <span className="text-sm text-neutral5">
             {getLabel("lWaitingTransaction")}
           </span>
-        ) : (
-          <Fragment />
         )}
 
-        {Boolean(transactionHash) ? (
-          <a
-            className={twJoin(
-              "underline",
-              "flex items-center gap-x-1",
-              "text-primary5 font-semibold"
-            )}
-            href={CommonUtils.getTransactionHashInfoLink(transactionHash || "")}
-            target="_blank"
-          >
-            View your transaction
-            <ExternalLinkIcon />
-          </a>
-        ) : (
-          <Fragment />
+        {transactionHash && (
+          <div className="flex flex-col gap-y-2">
+            <div className="text-xs text-neutral5">
+              Transaction Hash: {transactionHash.slice(0, 8)}...
+              {transactionHash.slice(-8)}
+            </div>
+            <a
+              className={twJoin(
+                "inline-flex items-center gap-x-2",
+                "px-3 py-2 rounded-lg",
+                "bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6]",
+                "hover:from-[#7c3aed] hover:to-[#9f7aea]",
+                "text-white font-medium text-sm",
+                "transition-all duration-200",
+                "hover:shadow-lg hover:shadow-purple-500/25"
+              )}
+              href={CommonUtils.getTransactionHashInfoLink(
+                transactionHash || ""
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClickCapture={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              View on Solana Explorer
+              <ExternalLinkIcon className="w-4 h-4" />
+            </a>
+          </div>
         )}
 
         {children}

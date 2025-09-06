@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
 import { Modal } from "@/components/ui/Modal";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/ui/button";
 import { useWallet, Wallet } from "@solana/wallet-adapter-react";
 import { useAppContext, useAuthContext } from "@/context";
-import { BlockchainTransactionStatusEnum, SolanaWalletsEnum } from "@/models";
+import { SolanaWalletsEnum } from "@/models";
 import { PublicKey } from "@solana/web3.js";
 import useInitUserVaultHooks from "@/hooks/billing-hooks/useInitUserVaultHooks";
-import { CommonTransactionToast } from "@/components/common";
 import { seeds } from "@/services/billing-service/sdk";
 import { isNil } from "lodash";
 import { useAppHooks } from "@/hooks";
@@ -21,14 +19,7 @@ const WalletConnect = () => {
     useAuthContext();
   const { connection, vertexProgram } = useAppContext();
   const { handleSubmitVertexBillingTransaction } = useAppHooks();
-  const {
-    handleInitUserVault,
-    transactionHash,
-    transactionStatus,
-    setTransactionHash,
-    setTransactionStatus,
-    handleReset,
-  } = useInitUserVaultHooks();
+  const { handleInitUserVault } = useInitUserVaultHooks();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -73,13 +64,10 @@ const WalletConnect = () => {
       )[0];
       const userVaultData = await connection.getAccountInfo(userVault);
       if (isNil(userVaultData)) {
-        setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
         const txHash = await handleInitUserVault({
           walletAddress,
         });
         if (!isMounted.current) return;
-        setTransactionHash(txHash!);
-        setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
 
         await handleSubmitVertexBillingTransaction({
           executionLayer: ExecutionLayer.BASE_CHAIN,
@@ -88,15 +76,9 @@ const WalletConnect = () => {
       }
     } catch (e) {
       if (!isMounted.current) return;
-      setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
       console.error(e);
     }
   };
-
-  const openToastTx =
-    transactionHash &&
-    transactionStatus &&
-    transactionStatus !== BlockchainTransactionStatusEnum.LOADING;
 
   return (
     <>
@@ -124,16 +106,6 @@ const WalletConnect = () => {
             ))}
         </div>
       </Modal>
-
-      {openToastTx &&
-        ReactDOM.createPortal(
-          <CommonTransactionToast
-            status={transactionStatus}
-            transactionHash={transactionHash!}
-            onReset={handleReset}
-          />,
-          document.body
-        )}
     </>
   );
 };

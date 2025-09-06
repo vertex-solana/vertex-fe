@@ -5,27 +5,38 @@ import {
   IdlDappResponse,
   IndexerResponse,
   IndexerTypeEnum,
+  VaultType,
 } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
 import { CommonInput, CommonPagination } from "@/components/common";
+import VaultBalance from "@/components/sn-home/VaultBalance";
+import DepositModal from "@/components/sn-home/modals/DepositModal";
 import { SearchIcon } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/context";
+import { useAppContext, useAuthContext } from "@/context";
 import { isNil } from "lodash";
 import { useAppHooks } from "@/hooks";
+import { PublicKey } from "@solana/web3.js";
+import { seeds } from "@/services/billing-service/sdk";
+import useVaultBalanceHooks from "@/hooks/billing-hooks/useVaultBalanceHooks";
 
 const Home = () => {
   const router = useRouter();
-  const { userInfo, setIndexer } = useAppContext();
+  const { userInfo, setIndexer, vertexProgram } = useAppContext();
   const { handleGetAllIndexers, handleGetIndexersOwner, handleGetIdls } =
     useAppHooks();
+  const { walletConnect } = useAuthContext();
 
   const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
+  const [isOpenDepositModal, setIsOpenDepositModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
+
+  const [userVaultPubkey, setUserVaultPubkey] = useState<PublicKey>();
+  const { getUserVaultBalance } = useVaultBalanceHooks();
 
   const [selectedTypeIndexer, setSelectedTypeIndexer] = useState(
     IndexerTypeEnum.All
@@ -92,6 +103,23 @@ const Home = () => {
     handleGetIndexerData(selectedTypeIndexer, 1, 5);
   }, [selectedTypeIndexer, userInfo]);
 
+  useEffect(() => {
+    if (walletConnect) {
+      setUserVaultPubkey(
+        PublicKey.findProgramAddressSync(
+          seeds.userVault(new PublicKey(walletConnect)),
+          vertexProgram.programId
+        )[0]
+      );
+    }
+  }, [walletConnect]);
+
+  const handleGetUserVaultBalance = async () => {
+    if (userVaultPubkey) {
+      await getUserVaultBalance(userVaultPubkey.toBase58());
+    }
+  };
+
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
       <div className="flex flex-col items-center gap-y-5 sm:gap-y-8 overflow-y-auto pt-[76px]">
@@ -106,13 +134,25 @@ const Home = () => {
         </p>
 
         {userInfo && (
-          <Button
-            className="w-[150px]"
-            onClick={() => setIsOpenCreateModal(true)}
-          >
-            Create Indexer
-            <ArrowDirectionIcon />
-          </Button>
+          <div className="flex items-center gap-x-4">
+            <VaultBalance
+              variant={VaultType.USER}
+              vaultAddress={userVaultPubkey?.toBase58()}
+            />
+            <Button
+              className="w-[150px] bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+              onClick={() => setIsOpenDepositModal(true)}
+            >
+              Deposit SOL
+            </Button>
+            <Button
+              className="w-[150px] bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+              onClick={() => setIsOpenCreateModal(true)}
+            >
+              Create Indexer
+              <ArrowDirectionIcon />
+            </Button>
+          </div>
         )}
 
         <div className="flex flex-col w-full sm:max-w-[80%] relative">
@@ -209,6 +249,16 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {isOpenDepositModal && (
+        <DepositModal
+          isOpen={isOpenDepositModal}
+          onClose={() => setIsOpenDepositModal(false)}
+          onDepositSuccess={() => {
+            handleGetUserVaultBalance();
+          }}
+        />
+      )}
 
       {isOpenCreateModal && (
         <CreateIndexerModal

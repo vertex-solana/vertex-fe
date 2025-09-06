@@ -8,14 +8,36 @@ import { usePathname } from "next/navigation";
 import EditorPanel from "@/components/sn-indexer/EditorPanel";
 import { useAppContext } from "@/context";
 import { useAppHooks } from "@/hooks";
+import VaultBalance from "@/components/sn-home/VaultBalance";
+import WithdrawModal from "@/components/sn-indexer/modals/WithdrawModal";
+import { Button } from "@/components/ui/button";
+import { isNil } from "lodash";
+import useVaultBalanceHooks from "@/hooks/billing-hooks/useVaultBalanceHooks";
+import { PublicKey } from "@solana/web3.js";
+import { seeds } from "@/services/billing-service/sdk";
+import { VaultType } from "@/models/app.model";
 
 const IndexerItem = () => {
   const indexerId = Number(usePathname().split("/indexers/").pop());
+  const { userInfo, indexer } = useAppContext();
 
-  const { setIndexer } = useAppContext();
+  const { setIndexer, vertexProgram } = useAppContext();
   const { handleGetIndexerDetail } = useAppHooks();
+  const { getIndexerVaultBalance, indexerVaultBalance } =
+    useVaultBalanceHooks();
 
+  const [indexerPubkey, setIndexerPubkey] = useState<PublicKey | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpenWithdrawModal, setIsOpenWithdrawModal] = useState(false);
+  const [isOwnerIndexer, setIsOwnerIndexer] = useState(false);
+  const [hasLoadedVaultBalance, setHasLoadedVaultBalance] = useState(false);
+
+  const handleGetIndexerVaultBalance = async () => {
+    if (indexerPubkey && !hasLoadedVaultBalance) {
+      await getIndexerVaultBalance(indexerPubkey.toBase58());
+      setHasLoadedVaultBalance(true);
+    }
+  };
 
   useEffect(() => {
     const getIndexer = async () => {
@@ -25,6 +47,19 @@ const IndexerItem = () => {
 
         if (response) {
           setIndexer(response);
+
+          const isOwner =
+            !isNil(userInfo) && userInfo.id === response.ownerAccountId;
+          setIsOwnerIndexer(isOwner);
+
+          if (isOwner && userInfo) {
+            setIndexerPubkey(
+              PublicKey.findProgramAddressSync(
+                seeds.indexer(new PublicKey(userInfo.walletAddress), indexerId),
+                vertexProgram.programId
+              )[0]
+            );
+          }
         }
 
         setIsLoading(false);
@@ -36,6 +71,17 @@ const IndexerItem = () => {
 
     getIndexer();
   }, [indexerId]);
+
+  useEffect(() => {
+    if (indexerPubkey && isOwnerIndexer && !hasLoadedVaultBalance) {
+      // Add a small delay to prevent immediate API calls
+      const timer = setTimeout(() => {
+        handleGetIndexerVaultBalance();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [indexerPubkey, isOwnerIndexer, hasLoadedVaultBalance]);
 
   const [activeTab, setActiveTab] = useState("tables");
 
@@ -64,6 +110,27 @@ const IndexerItem = () => {
         </div>
 
         <div className="flex-1 p-6 h-full w-full overflow-auto">
+          {isOwnerIndexer && indexerPubkey && (
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-x-4">
+                <VaultBalance
+                  variant={VaultType.INDEXER}
+                  showLabel={true}
+                  className="bg-[#1e2024] border-neutral6"
+                  vaultAddress={indexerPubkey.toBase58()}
+                  refreshTrigger={0} // Disable auto-refresh to prevent excessive calls
+                />
+              </div>
+              <Button
+                className="bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+                onClick={() => setIsOpenWithdrawModal(true)}
+                disabled={indexerVaultBalance === 0}
+              >
+                Withdraw SOL
+              </Button>
+            </div>
+          )}
+
           <TabsContent value="tables" className="h-full">
             <TablesAndTriggersView indexerId={indexerId} />
           </TabsContent>
@@ -72,6 +139,19 @@ const IndexerItem = () => {
           </TabsContent>
         </div>
       </Tabs>
+
+      {isOwnerIndexer && isOpenWithdrawModal && (
+        <WithdrawModal
+          isOpen={isOpenWithdrawModal}
+          onClose={() => setIsOpenWithdrawModal(false)}
+          indexerId={indexerId}
+          availableBalance={indexerVaultBalance}
+          onWithdrawSuccess={() => {
+            setHasLoadedVaultBalance(false); // Reset to allow refresh
+            handleGetIndexerVaultBalance();
+          }}
+        />
+      )}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { retry, wait } from "@/utils/common.utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import {
   Connection,
+  sendAndConfirmRawTransaction,
   Transaction,
   TransactionMessage,
   VersionedTransaction,
@@ -65,9 +66,9 @@ const useTransaction = () => {
 
       const rpcEndpoint = BlockChainUtils.getSolanaRpcEndpoint(rpcUrl);
 
-      const connection = new web3.Connection(rpcEndpoint, "confirmed");
+      const connection = new web3.Connection(rpcEndpoint, "finalized");
 
-      const latestBlockhash = await connection.getLatestBlockhash("confirmed");
+      const latestBlockhash = await connection.getLatestBlockhash("finalized");
       const messageV0 = new TransactionMessage({
         instructions: transactionData.instructions,
         payerKey: publicKey,
@@ -89,9 +90,10 @@ const useTransaction = () => {
 
       const signedTx = await signTransaction(versionedTx);
 
-      const signature = await connection.sendRawTransaction(
-        signedTx.serialize()
-      );
+      const buffer = Buffer.from(signedTx.serialize());
+      const signature = await sendAndConfirmRawTransaction(connection, buffer, {
+        commitment: "finalized",
+      });
 
       return {
         txHash: signature,
@@ -122,10 +124,7 @@ const useTransaction = () => {
     );
   };
 
-  const handleGetTransactionResult = async (
-    txHash: string,
-    rpcUrl?: string
-  ) => {
+  const handleGetTransactionResult = async (txHash: string) => {
     try {
       let txStatus = BlockchainTransactionStatusEnum.LOADING;
 
@@ -133,7 +132,7 @@ const useTransaction = () => {
         (await BlockchainService.getBlockchainServiceByChain()?.getTransactionResult(
           {
             txHash,
-            rpcEndpoint: rpcUrl,
+            rpcEndpoint: BlockChainUtils.getSolanaRpcEndpoint(),
           }
         )) as BlockchainTransactionStatusEnum;
 

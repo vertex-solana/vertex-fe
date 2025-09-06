@@ -17,9 +17,13 @@ import { useAppHooks } from "@/hooks";
 import Image from "next/image";
 import { ImageAssets } from "public";
 import { DropdownContent, DropdownRoot, DropdownTrigger } from "../common";
+import VaultBalance from "../sn-home/VaultBalance";
 import { ArrowIcon, LogoutIcon } from "../icons";
 import { useAppContext, useAuthContext } from "@/context";
 import WalletConnect from "./main-layout/WalletConnect";
+import { PublicKey } from "@solana/web3.js";
+import { seeds } from "@/services/billing-service/sdk";
+import { VaultType } from "@/models/app.model";
 
 type NavItem = {
   label: string;
@@ -36,9 +40,15 @@ export default function Header() {
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
 
   const { handleGetUserInfo } = useAppHooks();
-  const { userInfo, setIndexer, setUserInfo } = useAppContext();
-  const { handleLogout, isLoggedIn, setIsLoggedIn, setWalletConnect } =
-    useAuthContext();
+  const { userInfo, setIndexer, setUserInfo, vertexProgram } = useAppContext();
+  const {
+    handleLogout,
+    isLoggedIn,
+    setIsLoggedIn,
+    setWalletConnect,
+    walletConnect,
+  } = useAuthContext();
+  const [userVaultPubkey, setUserVaultPubkey] = useState<PublicKey>();
 
   const router = useRouter();
 
@@ -61,6 +71,17 @@ export default function Header() {
       fetchUserInfo(token);
     }
   }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (walletConnect) {
+      setUserVaultPubkey(
+        PublicKey.findProgramAddressSync(
+          seeds.userVault(new PublicKey(walletConnect)),
+          vertexProgram.programId
+        )[0]
+      );
+    }
+  }, [walletConnect, isLoggedIn]);
 
   const handleSignOut = async () => {
     setUserInfo(null);
@@ -116,54 +137,61 @@ export default function Header() {
 
           <div className="hidden md:flex items-center space-x-4 ">
             {isLoggedIn && userInfo ? (
-              <DropdownRoot
-                open={isOpenDropdown}
-                onOpenChange={() => setIsOpenDropdown(!isOpenDropdown)}
-              >
-                <DropdownTrigger>
-                  <div className="min-w-[114px] flex items-center justify-between gap-x-2 px-3 py-2.5 rounded-full bg-[#1e2024] text-neutral5">
-                    <Image
-                      src={ImageAssets.DefaultUserImage}
-                      alt="default user image"
-                      className="rounded-full w-7 h-7"
-                    />
-                    <p>
-                      {`${userInfo.walletAddress.slice(
+              <>
+                <VaultBalance
+                  variant={VaultType.USER}
+                  showLabel={false}
+                  vaultAddress={userVaultPubkey?.toBase58()}
+                />
+                <DropdownRoot
+                  open={isOpenDropdown}
+                  onOpenChange={() => setIsOpenDropdown(!isOpenDropdown)}
+                >
+                  <DropdownTrigger>
+                    <div className="min-w-[114px] flex items-center justify-between gap-x-2 px-3 py-2.5 rounded-full bg-[#1e2024] text-neutral5">
+                      <Image
+                        src={ImageAssets.DefaultUserImage}
+                        alt="default user image"
+                        className="rounded-full w-7 h-7"
+                      />
+                      <p>
+                        {`${userInfo.walletAddress.slice(
+                          0,
+                          6
+                        )}...${userInfo.walletAddress.slice(-5)}`}
+                      </p>
+                      <ArrowIcon
+                        className={twJoin(
+                          "text-neutral1",
+                          isOpenDropdown && "rotate-180"
+                        )}
+                      />
+                    </div>
+                  </DropdownTrigger>
+                  <DropdownContent
+                    className={twJoin(
+                      "w-fit text-sm",
+                      "overflow-hidden",
+                      "border border-white/20 bg-[#1e2024]"
+                    )}
+                    align="center"
+                  >
+                    <div className="flex flex-col gap-y-3 py-3 px-4 border-b-[0.5px] border-neutral5">
+                      <p>{`Address: ${userInfo.walletAddress.slice(
                         0,
                         6
-                      )}...${userInfo.walletAddress.slice(-5)}`}
-                    </p>
-                    <ArrowIcon
-                      className={twJoin(
-                        "text-neutral1",
-                        isOpenDropdown && "rotate-180"
-                      )}
-                    />
-                  </div>
-                </DropdownTrigger>
-                <DropdownContent
-                  className={twJoin(
-                    "w-fit text-sm",
-                    "overflow-hidden",
-                    "border border-white/20 bg-[#1e2024]"
-                  )}
-                  align="center"
-                >
-                  <div className="flex flex-col gap-y-3 py-3 px-4 border-b-[0.5px] border-neutral5">
-                    <p>{`Address: ${userInfo.walletAddress.slice(
-                      0,
-                      6
-                    )}...${userInfo.walletAddress.slice(-5)}`}</p>
-                    <p>{`Email: ${userInfo?.email}`}</p>
-                  </div>
-                  <button
-                    className="text-error2 p-3 w-full flex items-center gap-x-2 justify-center"
-                    onClick={handleSignOut}
-                  >
-                    Disconnect <LogoutIcon className="w-5 h-5" />
-                  </button>
-                </DropdownContent>
-              </DropdownRoot>
+                      )}...${userInfo.walletAddress.slice(-5)}`}</p>
+                      <p>{`Email: ${userInfo?.email}`}</p>
+                    </div>
+                    <button
+                      className="text-error2 p-3 w-full flex items-center gap-x-2 justify-center"
+                      onClick={handleSignOut}
+                    >
+                      Disconnect <LogoutIcon className="w-5 h-5" />
+                    </button>
+                  </DropdownContent>
+                </DropdownRoot>
+              </>
             ) : (
               <WalletConnect />
             )}
