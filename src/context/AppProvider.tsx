@@ -30,9 +30,15 @@ export const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [userInfo, setUserInfo] = useState<UserInfoInterface | null>(null);
   const [indexer, setIndexer] = useState<IndexerResponse | null>(null);
 
-  const connection = new Connection(BlockChainUtils.getSolanaRpcEndpoint());
-  const vertexProgram = getProgram(connection);
-
+  const connection = React.useMemo(
+    () => new Connection(BlockChainUtils.getSolanaRpcEndpoint()),
+    []
+  );
+  const vertexProgram = React.useMemo(
+    () => getProgram(connection),
+    [connection]
+  );
+  
   return (
     <AppContext.Provider
       value={{

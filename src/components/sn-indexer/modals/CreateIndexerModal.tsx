@@ -103,6 +103,8 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
           walletAddress: walletConnect!,
           indexerId: indexerResponse.id,
         });
+        if (!txHash) return;
+        
         await handleSubmitVertexBillingTransaction({
           executionLayer: ExecutionLayer.BASE_CHAIN,
           txHash: txHash!,

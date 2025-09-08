@@ -24,10 +24,14 @@ const useInitIndexerHooks = () => {
     );
     if (!initTx) {
       setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
-      return "";
+      return null;
     }
 
     const txHash = await handleSendTransaction(initTx);
+    if (!txHash) {
+      setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
+      return null;
+    }
 
     return txHash;
   };

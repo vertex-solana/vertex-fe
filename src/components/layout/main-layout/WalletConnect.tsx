@@ -81,10 +81,12 @@ const WalletConnect = () => {
         });
         if (!isMounted.current) return;
 
-        await handleSubmitVertexBillingTransaction({
-          executionLayer: ExecutionLayer.BASE_CHAIN,
-          txHash: txHash!,
-        });
+        if (txHash) {
+          await handleSubmitVertexBillingTransaction({
+            executionLayer: ExecutionLayer.BASE_CHAIN,
+            txHash: txHash!,
+          });
+        }
       }
     } catch (e) {
       if (!isMounted.current) return;

@@ -124,7 +124,9 @@ const IndexerItem = () => {
               <Button
                 className="bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
                 onClick={() => setIsOpenWithdrawModal(true)}
-                disabled={indexerVaultBalance === 0}
+                disabled={
+                  !hasLoadedVaultBalance || (indexerVaultBalance ?? 0) <= 0
+                }
               >
                 Withdraw SOL
               </Button>
