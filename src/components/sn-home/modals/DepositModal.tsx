@@ -75,7 +75,7 @@ const DepositModal: FC<DepositModalProps> = ({
   const watchedAmount = form.watch("amount");
   const currentAmount = parseFloat(watchedAmount) || 0;
   const isAmountValid = currentAmount > 0 && currentAmount <= maxSolBalance;
-  const isInsufficientBalance = currentAmount > maxSolBalance;
+  const isInsufficientBalance = currentAmount > 0 && currentAmount > maxSolBalance;
 
   const handleDeposit = async (amount: number) => {
     if (!userInfo || !walletConnect) {
@@ -173,13 +173,12 @@ const DepositModal: FC<DepositModalProps> = ({
   };
 
   return (
-    <>
-      <Modal
-        title="Deposit to User Vault"
-        description="Deposit SOL to your User Vault for indexer operations"
-        isOpen={isOpen}
-        onClose={handleCloseModal}
-      >
+    <Modal
+      title="Deposit to User Vault"
+      description="Deposit SOL to your User Vault for indexer operations"
+      isOpen={isOpen}
+      onClose={handleCloseModal}
+    >
         <div className="space-y-4 py-2 pb-4">
           <Form {...form}>
             <form
@@ -295,17 +294,16 @@ const DepositModal: FC<DepositModalProps> = ({
           </Form>
         </div>
 
-        {transactionHash &&
-          ReactDOM.createPortal(
-            <CommonTransactionToast
-              status={transactionStatus}
-              transactionHash={transactionHash}
-              onCloseCallback={handleTransactionToastClose}
-            />,
-            document.body
-          )}
-      </Modal>
-    </>
+      {transactionHash &&
+        ReactDOM.createPortal(
+          <CommonTransactionToast
+            status={transactionStatus}
+            transactionHash={transactionHash}
+            onCloseCallback={handleTransactionToastClose}
+          />,
+          document.body
+        )}
+    </Modal>
   );
 };
 

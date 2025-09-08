@@ -15,8 +15,13 @@ import { ExecutionLayer } from "@/models/app.model";
 const WalletConnect = () => {
   const { wallets, select, publicKey, wallet } = useWallet();
 
-  const { handleLoginWallet, setWalletConnect, setIsLoggedIn, isLoggedIn } =
-    useAuthContext();
+  const {
+    handleLoginWallet,
+    setWalletConnect,
+    setIsLoggedIn,
+    isLoggedIn,
+    walletConnect,
+  } = useAuthContext();
   const { connection, vertexProgram } = useAppContext();
   const { handleSubmitVertexBillingTransaction } = useAppHooks();
   const { handleInitUserVault } = useInitUserVaultHooks();
@@ -42,19 +47,26 @@ const WalletConnect = () => {
 
       const address = publicKey.toBase58();
 
-      await handleLoginWallet({
+      const walletAddressConnect = await handleLoginWallet({
         walletAddress: address,
         walletType: wallet.adapter.name as SolanaWalletsEnum,
-      }).catch((err) => console.error("Login error:", err));
+      });
+      if (!walletAddressConnect) return;
 
       setWalletConnect(address);
 
-      await handleStartInitUserVaultSafe(new PublicKey(address));
       if (isMounted.current) setIsLoggedIn(true);
     };
 
     login();
   }, [publicKey, wallet]);
+
+  useEffect(() => {
+    if (isLoggedIn && walletConnect) {
+      console.log("Starting init user vault safe");
+      handleStartInitUserVaultSafe(new PublicKey(walletConnect));
+    }
+  }, [walletConnect]);
 
   const handleStartInitUserVaultSafe = async (walletAddress: PublicKey) => {
     try {

@@ -77,7 +77,7 @@ const WithdrawModal: FC<WithdrawModalProps> = ({
   const watchedAmount = form.watch("amount");
   const currentAmount = parseFloat(watchedAmount) || 0;
   const isAmountValid = currentAmount > 0 && currentAmount <= availableBalance;
-  const isInsufficientBalance = currentAmount > availableBalance;
+  const isInsufficientBalance = currentAmount > 0 && currentAmount > availableBalance;
 
   const handleWithdraw = async (amount: number) => {
     if (!userInfo || !walletConnect) {
@@ -181,13 +181,12 @@ const WithdrawModal: FC<WithdrawModalProps> = ({
   };
 
   return (
-    <>
-      <Modal
-        title="Withdraw from Indexer Vault"
-        description="Withdraw SOL from your Indexer Vault"
-        isOpen={isOpen}
-        onClose={handleCloseModal}
-      >
+    <Modal
+      title="Withdraw from Indexer Vault"
+      description="Withdraw SOL from your Indexer Vault"
+      isOpen={isOpen}
+      onClose={handleCloseModal}
+    >
         <div className="space-y-4 py-2 pb-4">
           <Form {...form}>
             <form
@@ -318,17 +317,16 @@ const WithdrawModal: FC<WithdrawModalProps> = ({
           </Form>
         </div>
 
-        {transactionHash &&
-          ReactDOM.createPortal(
-            <CommonTransactionToast
-              status={transactionStatus}
-              transactionHash={transactionHash}
-              onCloseCallback={handleTransactionToastClose}
-            />,
-            document.body
-          )}
-      </Modal>
-    </>
+      {transactionHash &&
+        ReactDOM.createPortal(
+          <CommonTransactionToast
+            status={transactionStatus}
+            transactionHash={transactionHash}
+            onCloseCallback={handleTransactionToastClose}
+          />,
+          document.body
+        )}
+    </Modal>
   );
 };
 
