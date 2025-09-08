@@ -4,25 +4,36 @@ import { web3 } from "@project-serum/anchor";
 import { BlockchainTransactionStatusEnum } from "@/models";
 import { BlockchainService } from "@/services";
 
-import useSolanaTransaction from "./useSolanaTransaction";
+import { retry, wait } from "@/utils/common.utils";
+import { useWallet } from "@solana/wallet-adapter-react";
+import {
+  Connection,
+  sendAndConfirmRawTransaction,
+  Transaction,
+  TransactionMessage,
+  VersionedTransaction,
+} from "@solana/web3.js";
+import { BlockChainUtils } from "@/utils";
+import { toLower } from "lodash";
+
+export interface ResSendTransactionInterface {
+  txHash: string;
+  messageError: string;
+}
 
 const useTransaction = () => {
-  const { handleSendSolanaTransaction } = useSolanaTransaction();
+  const { signTransaction, connected, publicKey } = useWallet();
 
-  const [transactionHash, setTransactionHash] = useState("");
-  const [transactionError, setTransactionError] = useState("");
-  const [transactionStatus, setTransactionStatus] = useState<
-    BlockchainTransactionStatusEnum | undefined
-  >(undefined);
+  const [transactionHash, setTransactionHash] = useState<string>("");
+  const [transactionError, setTransactionError] = useState<string>("");
+  const [transactionStatus, setTransactionStatus] =
+    useState<BlockchainTransactionStatusEnum | null>(null);
 
-  const handleSendTransaction = async (
-    data: web3.Transaction | web3.Transaction[] | any // NOTE: Update additional type when implement new chain
-  ) => {
+  const handleSendTransaction = async (data: web3.Transaction) => {
     try {
       let resTransaction = { txHash: "", messageError: "" };
 
       resTransaction = await handleSendSolanaTransaction(data);
-
       if (resTransaction.messageError) {
         if (
           !resTransaction.messageError
@@ -32,11 +43,9 @@ const useTransaction = () => {
           setTransactionStatus(BlockchainTransactionStatusEnum.FAILED);
           setTransactionError(resTransaction.messageError);
         } else {
-          setTransactionStatus(undefined);
+          setTransactionStatus(null);
         }
       }
-
-      setTransactionHash(resTransaction.txHash);
 
       return resTransaction.txHash;
     } catch (error: any) {
@@ -47,10 +56,75 @@ const useTransaction = () => {
     }
   };
 
-  const handleGetTransactionResult = async (
-    txHash: string,
+  const handleSendSolanaTransaction = async (
+    transactionData: Transaction,
     rpcUrl?: string
   ) => {
+    try {
+      if (!connected || !transactionData || !signTransaction || !publicKey)
+        return {} as ResSendTransactionInterface;
+
+      const rpcEndpoint = BlockChainUtils.getSolanaRpcEndpoint(rpcUrl);
+
+      const connection = new web3.Connection(rpcEndpoint, "finalized");
+
+      const latestBlockhash = await connection.getLatestBlockhash("finalized");
+      const messageV0 = new TransactionMessage({
+        instructions: transactionData.instructions,
+        payerKey: publicKey,
+        recentBlockhash: latestBlockhash.blockhash,
+      }).compileToV0Message();
+      const versionedTx = new VersionedTransaction(messageV0);
+
+      const simulationResult = await simulateAndValidate(
+        connection,
+        versionedTx
+      );
+
+      if (simulationResult?.messageError) {
+        return {
+          txHash: "",
+          messageError: simulationResult.messageError,
+        };
+      }
+
+      const signedTx = await signTransaction(versionedTx);
+
+      const buffer = Buffer.from(signedTx.serialize());
+      const signature = await sendAndConfirmRawTransaction(connection, buffer, {
+        commitment: "finalized",
+      });
+
+      return {
+        txHash: signature,
+        messageError: "",
+      };
+    } catch (error: any) {
+      console.log("error", error.message);
+
+      const message = MESSAGE_USER_REJECTED_SUI_ERROR.includes(error.message)
+        ? AppConstant.USER_REJECTED_MESSAGE
+        : error.message;
+
+      return {
+        txHash: "",
+        messageError: message,
+      } as ResSendTransactionInterface;
+    }
+  };
+
+  const simulateAndValidate = async (
+    connection: Connection,
+    transactionData: web3.Transaction | VersionedTransaction
+  ): Promise<{ txHash: string; messageError: string } | undefined> => {
+    return retry(
+      () => simulateTransaction(connection, transactionData),
+      1000,
+      3
+    );
+  };
+
+  const handleGetTransactionResult = async (txHash: string) => {
     try {
       let txStatus = BlockchainTransactionStatusEnum.LOADING;
 
@@ -58,7 +132,7 @@ const useTransaction = () => {
         (await BlockchainService.getBlockchainServiceByChain()?.getTransactionResult(
           {
             txHash,
-            rpcEndpoint: rpcUrl,
+            rpcEndpoint: BlockChainUtils.getSolanaRpcEndpoint(),
           }
         )) as BlockchainTransactionStatusEnum;
 
@@ -75,7 +149,7 @@ const useTransaction = () => {
   const handleReset = () => {
     setTransactionHash("");
     setTransactionError("");
-    setTransactionStatus(undefined);
+    setTransactionStatus(null);
   };
 
   return {
@@ -86,9 +160,67 @@ const useTransaction = () => {
     handleReset,
     setTransactionError,
     setTransactionStatus,
+    setTransactionHash,
     handleSendTransaction,
     handleGetTransactionResult,
   };
 };
 
 export default useTransaction;
+
+const MESSAGE_USER_REJECTED_SUI_ERROR = ["Rejected from user"];
+
+const simulateTransaction = async (
+  connection: Connection,
+  transactionData: web3.Transaction | VersionedTransaction
+): Promise<{ txHash: string; messageError: string } | undefined> => {
+  let simulateResult;
+  if (transactionData instanceof VersionedTransaction) {
+    simulateResult = await connection.simulateTransaction(transactionData);
+  } else {
+    simulateResult = await connection.simulateTransaction(transactionData);
+  }
+
+  if (simulateResult?.value?.err) {
+    console.log("simulateResult: ", simulateResult);
+    const messageError = simulateResult.value.logs
+      ? handleGetErrorMessage(simulateResult.value.logs)
+      : "";
+
+    if (
+      toLower(messageError).includes("require_gte expression was violated") ||
+      toLower(messageError).includes("price slippage check")
+    ) {
+      throw Error(messageError);
+    }
+
+    return {
+      txHash: "",
+      messageError: messageError || "",
+    };
+  }
+  return;
+};
+
+const handleGetErrorMessage = (logs: string[]) => {
+  const errorMessagePrefix = "Error Message: ";
+
+  for (const log of logs) {
+    if (log.includes("insufficient lamports")) {
+      return "Insufficient SOL for Gas Fee";
+    }
+
+    const startIndex = log.indexOf(errorMessagePrefix);
+    if (startIndex !== -1) {
+      const endIndex = log.indexOf(".", startIndex);
+      return log
+        .substring(
+          startIndex + errorMessagePrefix.length,
+          endIndex === -1 ? log.length : endIndex
+        )
+        .trim();
+    }
+  }
+
+  return undefined;
+};

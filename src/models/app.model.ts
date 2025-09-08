@@ -1,5 +1,14 @@
 import { Idl } from "@coral-xyz/anchor";
+import { PublicKey } from "@solana/web3.js";
 import { Idl as IdlV30 } from "anchor-v30";
+
+export interface SolanaWalletProvider {
+  publicKey: PublicKey | null;
+  connect: () => Promise<void>;
+  signTransaction?: (transaction: any) => Promise<any>;
+  signAllTransactions?: (transactions: any[]) => Promise<any[]>;
+  // Add other methods/properties as needed
+}
 
 export interface UserInfoInterface {
   id: number;
@@ -99,4 +108,14 @@ export enum IndexerTypeEnum {
 export interface LoginWalletDataInterface {
   walletAddress: string;
   walletType: SolanaWalletsEnum;
+}
+
+export enum ExecutionLayer {
+  BASE_CHAIN = 'BASE_CHAIN',
+  EPHEMERAL_ROLLUP = 'EPHEMERAL_ROLLUP',
+}
+
+export enum VaultType {
+  USER = 'user',
+  INDEXER = 'indexer',
 }

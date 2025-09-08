@@ -3,14 +3,28 @@ import { Modal } from "@/components/ui/Modal";
 import { twMerge } from "tailwind-merge";
 import { Button } from "@/components/ui/button";
 import { useWallet, Wallet } from "@solana/wallet-adapter-react";
-import { useAuthContext } from "@/context";
+import { useAppContext, useAuthContext } from "@/context";
 import { SolanaWalletsEnum } from "@/models";
+import { PublicKey } from "@solana/web3.js";
+import useInitUserVaultHooks from "@/hooks/billing-hooks/useInitUserVaultHooks";
+import { seeds } from "@/services/billing-service/sdk";
+import { isNil } from "lodash";
+import { useAppHooks } from "@/hooks";
+import { ExecutionLayer } from "@/models/app.model";
 
 const WalletConnect = () => {
   const { wallets, select, publicKey, wallet } = useWallet();
 
-  const { handleLoginWallet, setWalletConnect, setIsLoggedIn, isLoggedIn } =
-    useAuthContext();
+  const {
+    handleLoginWallet,
+    setWalletConnect,
+    setIsLoggedIn,
+    isLoggedIn,
+    walletConnect,
+  } = useAuthContext();
+  const { connection, vertexProgram } = useAppContext();
+  const { handleSubmitVertexBillingTransaction } = useAppHooks();
+  const { handleInitUserVault } = useInitUserVaultHooks();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,27 +33,66 @@ const WalletConnect = () => {
     setIsOpen(false);
   };
 
+  const isMounted = React.useRef(true);
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    []
+  );
+
   useEffect(() => {
     const login = async () => {
       if (!publicKey || !wallet || isLoggedIn) return;
 
-      try {
-        const address = publicKey.toBase58();
+      const address = publicKey.toBase58();
 
-        await handleLoginWallet({
-          walletAddress: address,
-          walletType: wallet.adapter.name as SolanaWalletsEnum,
-        });
+      const walletAddressConnect = await handleLoginWallet({
+        walletAddress: address,
+        walletType: wallet.adapter.name as SolanaWalletsEnum,
+      });
+      if (!walletAddressConnect) return;
 
-        setWalletConnect(address);
-        setIsLoggedIn(true);
-      } catch (error) {
-        console.error("Login error:", error);
-      }
+      setWalletConnect(address);
+
+      if (isMounted.current) setIsLoggedIn(true);
     };
 
     login();
   }, [publicKey, wallet]);
+
+  useEffect(() => {
+    if (isLoggedIn && walletConnect) {
+      console.log("Starting init user vault safe");
+      handleStartInitUserVaultSafe(new PublicKey(walletConnect));
+    }
+  }, [walletConnect]);
+
+  const handleStartInitUserVaultSafe = async (walletAddress: PublicKey) => {
+    try {
+      const userVault = PublicKey.findProgramAddressSync(
+        seeds.userVault(walletAddress),
+        vertexProgram.programId
+      )[0];
+      const userVaultData = await connection.getAccountInfo(userVault);
+      if (isNil(userVaultData)) {
+        const txHash = await handleInitUserVault({
+          walletAddress,
+        });
+        if (!isMounted.current) return;
+
+        if (txHash) {
+          await handleSubmitVertexBillingTransaction({
+            executionLayer: ExecutionLayer.BASE_CHAIN,
+            txHash: txHash!,
+          });
+        }
+      }
+    } catch (e) {
+      if (!isMounted.current) return;
+      console.error(e);
+    }
+  };
 
   return (
     <>

@@ -49,6 +49,7 @@ import LPLeverageStrategyIcon from "./LPLeverageStrategyIcon";
 import SelfPickedStrategyIcon from "./SelfPickedStrategyIcon";
 import ArrowDownFillIcon from "./ArrowDownFillIcon";
 import ArrowEndIcon from "./ArrowEndIcon";
+import WalletIcon from "./WalletIcon";
 
 export {
   ArrowDownFillIcon,
@@ -102,4 +103,5 @@ export {
   AutomatedStrategyIcon,
   LPLeverageStrategyIcon,
   SelfPickedStrategyIcon,
+  WalletIcon,
 };

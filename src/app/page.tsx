@@ -1,31 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   IdlDappResponse,
   IndexerResponse,
   IndexerTypeEnum,
+  VaultType,
 } from "@/models/app.model";
 import { Button } from "@/components/ui/button";
 import CreateIndexerModal from "@/components/sn-indexer/modals/CreateIndexerModal";
 import { ArrowDirectionIcon } from "@/components/icons";
 import { CommonInput, CommonPagination } from "@/components/common";
+import VaultBalance from "@/components/sn-home/VaultBalance";
+import DepositModal from "@/components/sn-home/modals/DepositModal";
 import { SearchIcon } from "lucide-react";
 import { twJoin } from "tailwind-merge";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/context";
+import { useAppContext, useAuthContext } from "@/context";
 import { isNil } from "lodash";
 import { useAppHooks } from "@/hooks";
+import { PublicKey } from "@solana/web3.js";
+import { seeds } from "@/services/billing-service/sdk";
+import useVaultBalanceHooks from "@/hooks/billing-hooks/useVaultBalanceHooks";
 
 const Home = () => {
   const router = useRouter();
-  const { userInfo, setIndexer } = useAppContext();
+  const { userInfo, setIndexer, vertexProgram } = useAppContext();
   const { handleGetAllIndexers, handleGetIndexersOwner, handleGetIdls } =
     useAppHooks();
+  const { walletConnect } = useAuthContext();
 
   const [idls, setIdls] = useState<IdlDappResponse[]>([]);
   const [isOpenCreateModal, setIsOpenCreateModal] = useState(false);
+  const [isOpenDepositModal, setIsOpenDepositModal] = useState(false);
   const [indexers, setIndexers] = useState<IndexerResponse[]>([]);
+
+  const [userVaultPubkey, setUserVaultPubkey] = useState<PublicKey>();
+  const { getUserVaultBalance, refreshVaultBalance } = useVaultBalanceHooks();
+  const hasInitialized = useRef(false);
+  const hasFetchedIdlsForModal = useRef(false);
 
   const [selectedTypeIndexer, setSelectedTypeIndexer] = useState(
     IndexerTypeEnum.All
@@ -43,30 +56,24 @@ const Home = () => {
     setIndexers(filterIndexers || []);
   };
 
-  useEffect(() => {
-    const getIdls = async () => {
-      try {
-        // TODO: Handle Pagination
-        const response = await handleGetIdls({});
-        if (response) {
-          setIdls(response.pageData || []);
-        }
-      } catch (error) {
-        console.error("Error fetching Idl:", error);
-      }
-    };
-    getIdls();
-  }, [isOpenCreateModal]);
-
-  const handleGetIndexerData = async (
-    indexerType: IndexerTypeEnum,
-    pageNum: number,
-    pageSize: number
-  ) => {
+  const fetchIdls = useCallback(async () => {
     try {
-      if (isNil(userInfo)) {
-        setIndexers([]);
-      } else {
+      const response = await handleGetIdls({});
+      if (response) {
+        setIdls(response.pageData || []);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching IDLs:", error);
+    }
+  }, [handleGetIdls]);
+
+  const handleGetIndexerData = useCallback(
+    async (indexerType: IndexerTypeEnum, pageNum: number, pageSize: number) => {
+      try {
+        if (isNil(userInfo)) {
+          setIndexers([]);
+          return;
+        }
         let response;
 
         if (indexerType === IndexerTypeEnum.Owner) {
@@ -82,15 +89,72 @@ const Home = () => {
             totalItem: response.total || 0,
           });
         }
+      } catch (error) {
+        console.error("❌ Error fetching indexers:", error);
       }
-    } catch (error) {
-      console.error("Error fetching indexers:", error);
-    }
-  };
+    },
+    [userInfo, handleGetIndexersOwner, handleGetAllIndexers]
+  );
 
   useEffect(() => {
-    handleGetIndexerData(selectedTypeIndexer, 1, 5);
+    const initializeData = async () => {
+      if (!userInfo) {
+        hasInitialized.current = false;
+        return;
+      }
+
+      if (hasInitialized.current) {
+        return;
+      }
+
+      hasInitialized.current = true;
+
+      await Promise.all([
+        fetchIdls(),
+        handleGetIndexerData(selectedTypeIndexer, 1, 5),
+      ]);
+    };
+
+    initializeData();
   }, [selectedTypeIndexer, userInfo]);
+
+  useEffect(() => {
+    if (userInfo && hasInitialized.current) {
+      handleGetIndexerData(selectedTypeIndexer, 1, 5);
+    }
+  }, [selectedTypeIndexer, userInfo]);
+
+  useEffect(() => {
+    if (isOpenCreateModal && userInfo) {
+      if (!hasFetchedIdlsForModal.current) {
+        hasFetchedIdlsForModal.current = true;
+        fetchIdls();
+      }
+    } else if (!isOpenCreateModal) {
+      hasFetchedIdlsForModal.current = false;
+    }
+  }, [isOpenCreateModal, userInfo]);
+
+  useEffect(() => {
+    if (walletConnect && vertexProgram) {
+      setUserVaultPubkey(
+        PublicKey.findProgramAddressSync(
+          seeds.userVault(new PublicKey(walletConnect)),
+          vertexProgram.programId
+        )[0]
+      );
+    }
+  }, [walletConnect, vertexProgram]);
+
+  const handleGetUserVaultBalance = useCallback(async () => {
+    if (userVaultPubkey) {
+      refreshVaultBalance(VaultType.USER, userVaultPubkey.toBase58());
+    }
+  }, [userVaultPubkey, refreshVaultBalance]);
+
+  const handleIndexerCreated = useCallback(async () => {
+    await handleGetIndexerData(selectedTypeIndexer, 1, 5);
+  }, [selectedTypeIndexer, handleGetIndexerData]);
 
   return (
     <div className="min-h-[calc(100vh-76px)] flex flex-col pt-10 pb-10">
@@ -106,13 +170,25 @@ const Home = () => {
         </p>
 
         {userInfo && (
-          <Button
-            className="w-[150px]"
-            onClick={() => setIsOpenCreateModal(true)}
-          >
-            Create Indexer
-            <ArrowDirectionIcon />
-          </Button>
+          <div className="flex items-center gap-x-4">
+            <VaultBalance
+              variant={VaultType.USER}
+              vaultAddress={userVaultPubkey?.toBase58()}
+            />
+            <Button
+              className="w-[150px] bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+              onClick={() => setIsOpenDepositModal(true)}
+            >
+              Deposit SOL
+            </Button>
+            <Button
+              className="w-[150px] bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+              onClick={() => setIsOpenCreateModal(true)}
+            >
+              Create Indexer
+              <ArrowDirectionIcon />
+            </Button>
+          </div>
         )}
 
         <div className="flex flex-col w-full sm:max-w-[80%] relative">
@@ -210,11 +286,22 @@ const Home = () => {
         </div>
       </div>
 
+      {isOpenDepositModal && (
+        <DepositModal
+          isOpen={isOpenDepositModal}
+          onClose={() => setIsOpenDepositModal(false)}
+          onDepositSuccess={() => {
+            handleGetUserVaultBalance();
+          }}
+        />
+      )}
+
       {isOpenCreateModal && (
         <CreateIndexerModal
           isOpen={isOpenCreateModal}
           onClose={() => setIsOpenCreateModal(false)}
           idls={idls}
+          onIndexerCreated={handleIndexerCreated}
         />
       )}
     </div>

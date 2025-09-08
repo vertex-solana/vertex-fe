@@ -230,11 +230,11 @@ export const getDappServicesResponseListData = <T>(
 };
 
 export const getProvider = () => {
-  const provider = "solana-provider";
+  const provider = "walletName";
 
   return {
     keyProvider: provider,
-    provider: localStorage.getItem(provider),
+    provider: localStorage.getItem(provider)?.slice(1, -1),
   };
 };
 

@@ -6,6 +6,7 @@ import {
   CreateTriggerAndTransformerPayload,
   GetAllIdlsParams,
   GetAllIndexersParams,
+  SubmitVertexBillingTransactionPayload,
   UpdateTransformerScriptPayload,
   UploadIdlPayload,
 } from "./interface";
@@ -167,9 +168,16 @@ export const uploadIdl = async (payload: UploadIdlPayload): Promise<void> => {
 
 export const createIndexer = async (
   payload: CreateIndexerPayload
-): Promise<void> => {
+): Promise<IndexerResponse | undefined> => {
   try {
-    await axiosInstance.post(ApiConstant.CREATE_INDEXER, payload);
+    const response: AxiosResponse<BaseResponseData<IndexerResponse>> =
+      await axiosInstance.post(ApiConstant.CREATE_INDEXER, payload);
+    const responseData = CommonUtils.getDappServicesResponseData(response);
+    if (responseData) {
+      return responseData;
+    } else {
+      return undefined;
+    }
   } catch (error) {
     console.error("Error creating indexer:", error);
     throw error;
@@ -353,6 +361,20 @@ export const createQueryLog = async (
     });
 
     await axiosInstance.post(apiUrl, payload);
+  } catch (error) {
+    console.error("Error creating query log:", error);
+    throw error;
+  }
+};
+
+export const submitVertexBillingTransaction = async (
+  payload: SubmitVertexBillingTransactionPayload
+): Promise<void> => {
+  try {
+    await axiosInstance.post(
+      ApiConstant.SUBMIT_VERTEX_BILLING_TRANSACTION,
+      payload
+    );
   } catch (error) {
     console.error("Error creating query log:", error);
     throw error;

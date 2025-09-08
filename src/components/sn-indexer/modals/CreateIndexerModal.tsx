@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, useState } from "react";
+import ReactDOM from "react-dom";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,10 +25,14 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { IdlDappResponse } from "@/models/app.model";
+import { ExecutionLayer, IdlDappResponse } from "@/models/app.model";
 import { Textarea } from "@/components/ui/textarea";
 import { Cluster } from "@/const/app.const";
 import { useAppHooks } from "@/hooks";
+import useInitIndexerHooks from "@/hooks/billing-hooks/useInitIndexerHooks";
+import { useAuthContext } from "@/context";
+import { BlockchainTransactionStatusEnum } from "@/models";
+import { CommonTransactionToast } from "@/components/common";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -41,16 +46,29 @@ interface CreateIndexerModalProps {
   isOpen: boolean;
   onClose: () => void;
   idls: IdlDappResponse[];
+  onIndexerCreated?: () => void;
 }
 
 const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
   isOpen,
   onClose,
   idls,
+  onIndexerCreated,
 }) => {
-  const { handleCreateIndexer } = useAppHooks();
+  const { walletConnect } = useAuthContext();
+  const { handleCreateIndexer, handleSubmitVertexBillingTransaction } =
+    useAppHooks();
+  const {
+    handleInitIndexer,
+    setTransactionHash,
+    setTransactionStatus,
+    transactionHash,
+    transactionStatus,
+    handleReset,
+  } = useInitIndexerHooks();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isTransactionSuccess, setIsTransactionSuccess] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,10 +95,29 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
         programId: values.programId.trim(),
       };
 
-      await handleCreateIndexer(payload);
+      const indexerResponse = await handleCreateIndexer(payload);
 
-      toast.success("Indexer created successfully!");
-      onClose();
+      if (indexerResponse) {
+        setTransactionStatus(BlockchainTransactionStatusEnum.LOADING);
+        const txHash = await handleInitIndexer({
+          walletAddress: walletConnect!,
+          indexerId: indexerResponse.id,
+        });
+        if (!txHash) return;
+        
+        await handleSubmitVertexBillingTransaction({
+          executionLayer: ExecutionLayer.BASE_CHAIN,
+          txHash: txHash!,
+        });
+
+        setTransactionHash(txHash!);
+        setTransactionStatus(BlockchainTransactionStatusEnum.SUCCESS);
+        setIsTransactionSuccess(true);
+
+        if (onIndexerCreated) {
+          onIndexerCreated();
+        }
+      }
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to create indexer. Please try again.");
@@ -111,7 +148,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                     <FormLabel>Indexer Name:</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={isLoading}
+                        disabled={isLoading || isTransactionSuccess}
                         placeholder="Kamino Indexer"
                         {...field}
                       />
@@ -128,7 +165,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                     <FormLabel>Description:</FormLabel>
                     <FormControl>
                       <Textarea
-                        disabled={isLoading}
+                        disabled={isLoading || isTransactionSuccess}
                         placeholder="Kamino Indexer"
                         {...field}
                       />
@@ -145,7 +182,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                     <FormLabel>Program ID:</FormLabel>
                     <FormControl>
                       <Input
-                        disabled={isLoading}
+                        disabled={isLoading || isTransactionSuccess}
                         placeholder="KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD"
                         {...field}
                       />
@@ -162,7 +199,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                     <FormLabel>IDL:</FormLabel>
                     <FormControl>
                       <Select
-                        disabled={isLoading}
+                        disabled={isLoading || isTransactionSuccess}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger>
@@ -198,7 +235,7 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                     <FormLabel>Cluster:</FormLabel>
                     <FormControl>
                       <Select
-                        disabled={isLoading}
+                        disabled={isLoading || isTransactionSuccess}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger>
@@ -220,21 +257,43 @@ const CreateIndexerModal: FC<CreateIndexerModalProps> = ({
                 )}
               />
               <div className="pt-6 space-x-2 flex items-center justify-end w-full">
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  Create
-                </Button>
+                {isTransactionSuccess ? (
+                  <Button
+                    className="w-[150px] bg-gradient-to-r from-[#6d2ef4] to-[#8b5cf6] hover:from-[#7c3aed] hover:to-[#9f7aea] hover:shadow-lg hover:shadow-purple-500/25"
+                    onClick={onClose}
+                  >
+                    Close
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      onClick={onClose}
+                      disabled={isLoading}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={isLoading}>
+                      Create
+                    </Button>
+                  </>
+                )}
               </div>
             </form>
           </Form>
         </div>
       </div>
+      {transactionHash &&
+        ReactDOM.createPortal(
+          <CommonTransactionToast
+            status={transactionStatus}
+            transactionHash={transactionHash}
+            onCloseCallback={() => {
+              handleReset();
+            }}
+          />,
+          document.body
+        )}
     </Modal>
   );
 };

@@ -30,7 +30,7 @@ export const BREAK_POINTS = {
 export const GOOGLE_ANALYTICS_ID = "G-G2M5X8ZT8R";
 
 export enum Cluster {
-  MAINNET = "mainnet",
+  // MAINNET = "mainnet", // Note: Disable mainnet
   DEVNET = "devnet",
   TESTNET = "testnet",
 }

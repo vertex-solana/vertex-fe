@@ -2,22 +2,25 @@ import * as web3 from "@solana/web3.js";
 import * as splToken from "@solana/spl-token";
 import { SolanaWalletsEnum } from "@/models";
 import { PublicKey } from "@solana/web3.js";
+import { SolanaWalletProvider } from "@/models/app.model";
 
-export const getSolanaWalletsProvider = (solWallet?: SolanaWalletsEnum) => {
-  if (typeof window === undefined) return undefined;
+export const getSolanaWalletsProvider = (
+  solWallet?: SolanaWalletsEnum
+): SolanaWalletProvider | null => {
+  if (typeof window === undefined) return null;
 
   switch (solWallet) {
     case SolanaWalletsEnum.Backpack:
       return window?.backpack?.solana;
 
     case SolanaWalletsEnum.Phantom:
-      return window?.phantom?.solana;
+      return window.phantom?.solana;
 
     case SolanaWalletsEnum.Solflare:
       return window?.solflare;
 
     default:
-      return undefined;
+      return null;
   }
 };
 

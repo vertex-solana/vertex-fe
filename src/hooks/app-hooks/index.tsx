@@ -13,6 +13,7 @@ import {
   getIndexerOwner,
   getTablesInIndexer,
   getTriggersAndTransformers,
+  submitVertexBillingTransaction,
   updateTransformerScript,
   uploadIdl,
 } from "@/services/app-service";
@@ -21,6 +22,7 @@ import {
   CreateQueryLogPayload,
   CreateTablePayload,
   CreateTriggerAndTransformerPayload,
+  SubmitVertexBillingTransactionPayload,
   UpdateTransformerScriptPayload,
   UploadIdlPayload,
 } from "@/services/app-service/interface";
@@ -143,6 +145,12 @@ const useAppHooks = () => {
     return await createQueryLog(payload);
   };
 
+  const handleSubmitVertexBillingTransaction = async (
+    payload: SubmitVertexBillingTransactionPayload
+  ) => {
+    return await submitVertexBillingTransaction(payload);
+  };
+
   return {
     handleGetUserInfo,
 
@@ -163,6 +171,8 @@ const useAppHooks = () => {
     handleExecuteQuery,
     handleGetAllQueryLogs,
     handleCreateQueryLog,
+
+    handleSubmitVertexBillingTransaction,
   };
 };
 
